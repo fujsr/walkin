@@ -22,9 +22,12 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
 .totals div span { font-size: 1.4em; font-weight: bold; }
 
 .executives { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 40px; }
-.executive-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); text-align: center; width: 140px; flex-shrink: 0; }
+.executive-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); text-align: center; width: 160px; flex-shrink: 0; }
 .executive-card h3 { margin: 0 0 10px; color: #34495e; font-size: 1em; }
-.executive-card span { font-size: 1.4em; font-weight: bold; color: #27ae60; }
+.count-control { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 5px; }
+.count-control button { padding: 4px 10px; border: none; border-radius: 6px; background: #2980b9; color: white; font-weight: bold; cursor: pointer; }
+.count-control button:hover { background: #1f618d; }
+.count-display { font-size: 1.2em; font-weight: bold; color: #27ae60; min-width: 30px; text-align: center; }
 
 .add-walkin, .export-section { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto 20px; text-align: center; }
 .add-walkin select, .add-walkin input, .export-section input { padding: 10px; margin: 10px 5px; border-radius: 8px; border: 1px solid #ccc; width: 120px; }
@@ -78,6 +81,7 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
 
   const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
   const execTotals = {};
+  const execKeys = {}; // store latest firebase key per exec for +/- changes
 
   const grid = document.getElementById('executivesGrid');
   const dropdown = document.getElementById('executiveSelect');
@@ -86,11 +90,16 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
   executives.forEach(exec => {
     execTotals[exec] = 0;
 
-    // Card
+    // Card with + / - buttons
     const card = document.createElement('div');
     card.className = 'executive-card';
     card.id = `card-${exec}`;
-    card.innerHTML = `<h3>${exec}</h3><span id="count-${exec}">0</span>`;
+    card.innerHTML = `<h3>${exec}</h3>
+      <div class="count-control">
+        <button onclick="adjustWalkin('${exec}', -1)">−</button>
+        <span id="count-${exec}" class="count-display">0</span>
+        <button onclick="adjustWalkin('${exec}', 1)">+</button>
+      </div>`;
     grid.appendChild(card);
 
     // Dropdown
@@ -102,6 +111,7 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
 
   function formatDate(date){ return date.toISOString().split('T')[0]; }
 
+  // Add walk-in via input
   function addWalkin(){
     const exec = dropdown.value;
     const count = parseInt(document.getElementById('walkinCount').value);
@@ -111,6 +121,14 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
     document.getElementById('walkinCount').value = '';
   }
 
+  // Adjust + / - buttons
+  function adjustWalkin(exec, delta){
+    // Push as a new entry with positive or negative count
+    const timestamp = Date.now();
+    db.ref('walkins').push({ executive: exec, count: delta, timestamp });
+  }
+
+  // Update counters
   function updateTotals(snapshot){
     let totalToday=0, totalWeek=0, totalMonth=0;
     executives.forEach(exec => execTotals[exec] = 0);
@@ -122,21 +140,27 @@ h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
       const data = child.val();
       const date = new Date(data.timestamp);
 
+      // Sum per executive
       execTotals[data.executive] += data.count;
+      if(execTotals[data.executive] < 0) execTotals[data.executive] = 0; // no negative totals
 
+      // Daily/weekly/monthly
       if(formatDate(date) === formatDate(now)) totalToday += data.count;
       if(date >= startOfWeek) totalWeek += data.count;
       if(date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) totalMonth += data.count;
     });
 
+    // Update UI
     executives.forEach(exec => document.getElementById(`count-${exec}`).textContent = execTotals[exec]);
-    document.getElementById('totalToday').textContent = totalToday;
-    document.getElementById('totalWeek').textContent = totalWeek;
-    document.getElementById('totalMonth').textContent = totalMonth;
+    document.getElementById('totalToday').textContent = totalToday < 0 ? 0 : totalToday;
+    document.getElementById('totalWeek').textContent = totalWeek < 0 ? 0 : totalWeek;
+    document.getElementById('totalMonth').textContent = totalMonth < 0 ? 0 : totalMonth;
   }
 
+  // Listen live changes
   db.ref('walkins').on('value', updateTotals);
 
+  // Export Excel
   function exportData(){
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
