@@ -3,187 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Showroom Walk-in Tracker</title>
+<title>Fujairah Showroom Walk-in Tracker</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-<!-- SheetJS for Excel export -->
+<!-- SheetJS -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; color: #333; margin: 0; padding: 20px; }
-h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+h1 { text-align: center; margin-bottom: 25px; }
 
-.totals { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 30px; }
-.totals div { background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; min-width: 120px; }
-.totals div h2 { margin: 0 0 10px; color: #2980b9; font-size: 1em; }
-.totals div span { font-size: 1.4em; font-weight: bold; }
+.totals { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
+.totals div { background: white; padding: 15px 20px; border-radius: 10px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+.totals h3 { margin: 0; font-size: 14px; color: #555; }
+.totals span { font-size: 20px; font-weight: bold; color: #2c3e50; }
 
-.executives { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 40px; }
-.executive-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); text-align: center; width: 160px; flex-shrink: 0; }
-.executive-card h3 { margin: 0 0 10px; color: #34495e; font-size: 1em; }
-.count-control { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 5px; }
-.count-control button { padding: 4px 10px; border: none; border-radius: 6px; background: #2980b9; color: white; font-weight: bold; cursor: pointer; }
-.count-control button:hover { background: #1f618d; }
-.count-display { font-size: 1.2em; font-weight: bold; color: #27ae60; min-width: 30px; text-align: center; }
+.executives { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
 
-.add-walkin, .export-section { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto 20px; text-align: center; }
-.add-walkin select, .add-walkin input, .export-section input { padding: 10px; margin: 10px 5px; border-radius: 8px; border: 1px solid #ccc; width: 120px; }
-.add-walkin button, .export-section button { padding: 10px 20px; border: none; border-radius: 8px; background: #2980b9; color: white; cursor: pointer; font-size: 1em; }
-.add-walkin button:hover, .export-section button:hover { background: #1f618d; }
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
 
-@media (max-width: 500px) {
-  .executive-card { width: 45%; }
-  .totals { gap: 10px; }
+.card h3 { margin: 0 0 10px; font-size: 14px; }
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls button {
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 8px;
+  background: #2980b9;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.controls button:hover { background: #1f618d; }
+
+.count {
+  font-size: 18px;
+  font-weight: bold;
+  min-width: 30px;
+}
+
+.export-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.export-section input {
+  padding: 8px;
+  margin: 5px;
+}
+
+.export-section button {
+  padding: 10px 15px;
+  border: none;
+  background: #2980b9;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.export-section button:hover { background: #1f618d; }
+
+@media(max-width:500px){
+  h1 { font-size: 18px; }
 }
 </style>
 </head>
 <body>
 
-<h1>Showroom Walk-in Tracker</h1>
+<h1>Fujairah Showroom Walk-in Tracker</h1>
 
 <div class="totals">
-  <div><h2>Daily</h2><span id="totalToday">0</span></div>
-  <div><h2>Weekly</h2><span id="totalWeek">0</span></div>
-  <div><h2>Monthly</h2><span id="totalMonth">0</span></div>
+  <div><h3>Daily</h3><span id="daily">0</span></div>
+  <div><h3>Weekly</h3><span id="weekly">0</span></div>
+  <div><h3>Monthly</h3><span id="monthly">0</span></div>
 </div>
 
-<div class="executives" id="executivesGrid"></div>
-
-<div class="add-walkin">
-  <h3>Add Walk-ins</h3>
-  <select id="executiveSelect"></select>
-  <input type="number" id="walkinCount" placeholder="Number" min="1">
-  <button onclick="addWalkin()">Add</button>
-</div>
+<div class="executives" id="grid"></div>
 
 <div class="export-section">
   <h3>Export Data</h3>
-  <input type="date" id="startDate"> to <input type="date" id="endDate">
+  <input type="date" id="startDate"> to 
+  <input type="date" id="endDate">
+  <br><br>
   <button onclick="exportData()">Export Excel</button>
 </div>
 
 <script>
-  // ===== Firebase Config =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyCnFfEuXiPieUC7e--k-GJg9XYKas0CeFo",
-    authDomain: "walkins-1075c.firebaseapp.com",
-    databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
-    projectId: "walkins-1075c",
-    storageBucket: "walkins-1075c.firebasestorage.app",
-    messagingSenderId: "120467264924",
-    appId: "1:120467264924:web:1720f66ad02dacfb53e459"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyCnFfEuXiPieUC7e--k-GJg9XYKas0CeFo",
+  authDomain: "walkins-1075c.firebaseapp.com",
+  databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
+  projectId: "walkins-1075c",
+  storageBucket: "walkins-1075c.firebasestorage.app",
+  messagingSenderId: "120467264924",
+  appId: "1:120467264924:web:1720f66ad02dacfb53e459"
+};
 
-  const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
-  const execTotals = {};
-  const execKeys = {}; // store latest firebase key per exec for +/- changes
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  const grid = document.getElementById('executivesGrid');
-  const dropdown = document.getElementById('executiveSelect');
+const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
+const totals = {};
+const grid = document.getElementById("grid");
 
-  // Initialize cards & dropdown
-  executives.forEach(exec => {
-    execTotals[exec] = 0;
+// Create UI
+executives.forEach(name => {
+  totals[name] = 0;
 
-    // Card with + / - buttons
-    const card = document.createElement('div');
-    card.className = 'executive-card';
-    card.id = `card-${exec}`;
-    card.innerHTML = `<h3>${exec}</h3>
-      <div class="count-control">
-        <button onclick="adjustWalkin('${exec}', -1)">−</button>
-        <span id="count-${exec}" class="count-display">0</span>
-        <button onclick="adjustWalkin('${exec}', 1)">+</button>
-      </div>`;
-    grid.appendChild(card);
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `
+    <h3>${name}</h3>
+    <div class="controls">
+      <button onclick="update('${name}', -1)">−</button>
+      <span class="count" id="${name}">0</span>
+      <button onclick="update('${name}', 1)">+</button>
+    </div>
+  `;
+  grid.appendChild(div);
+});
 
-    // Dropdown
-    const option = document.createElement('option');
-    option.value = exec;
-    option.textContent = exec;
-    dropdown.appendChild(option);
+// Add / subtract
+function update(name, value){
+  if(value < 0 && !confirm("Reduce count?")) return;
+
+  db.ref("walkins").push({
+    executive: name,
+    count: value,
+    timestamp: Date.now()
+  });
+}
+
+// Live update
+db.ref("walkins").on("value", snap => {
+  let d=0,w=0,m=0;
+
+  executives.forEach(e => totals[e]=0);
+
+  const now = new Date();
+  const weekStart = new Date();
+  weekStart.setDate(now.getDate()-now.getDay());
+  weekStart.setHours(0,0,0,0);
+
+  snap.forEach(child=>{
+    const data = child.val();
+    const date = new Date(data.timestamp);
+
+    totals[data.executive]+=data.count;
+    if(totals[data.executive]<0) totals[data.executive]=0;
+
+    if(date.toDateString()===now.toDateString()) d+=data.count;
+    if(date>=weekStart) w+=data.count;
+    if(date.getMonth()===now.getMonth()) m+=data.count;
   });
 
-  function formatDate(date){ return date.toISOString().split('T')[0]; }
+  executives.forEach(e=>{
+    document.getElementById(e).innerText = totals[e];
+  });
 
-  // Add walk-in via input
-  function addWalkin(){
-    const exec = dropdown.value;
-    const count = parseInt(document.getElementById('walkinCount').value);
-    if(!count || count <= 0) return alert("Enter a valid number");
-    const timestamp = Date.now();
-    db.ref('walkins').push({ executive: exec, count, timestamp });
-    document.getElementById('walkinCount').value = '';
-  }
+  document.getElementById("daily").innerText = Math.max(0,d);
+  document.getElementById("weekly").innerText = Math.max(0,w);
+  document.getElementById("monthly").innerText = Math.max(0,m);
+});
 
-  // Adjust + / - buttons
-  function adjustWalkin(exec, delta){
-    // Push as a new entry with positive or negative count
-    const timestamp = Date.now();
-    db.ref('walkins').push({ executive: exec, count: delta, timestamp });
-  }
+// Export Excel
+function exportData(){
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
 
-  // Update counters
-  function updateTotals(snapshot){
-    let totalToday=0, totalWeek=0, totalMonth=0;
-    executives.forEach(exec => execTotals[exec] = 0);
+  if(!start || !end) return alert("Select dates");
 
-    const now = new Date();
-    const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+  db.ref("walkins").once("value").then(snap=>{
+    const rows=[["Executive","Count","Date","Time"]];
 
-    snapshot.forEach(child=>{
-      const data = child.val();
-      const date = new Date(data.timestamp);
+    snap.forEach(child=>{
+      const data=child.val();
+      const date=new Date(data.timestamp);
+      const d=date.toISOString().split("T")[0];
 
-      // Sum per executive
-      execTotals[data.executive] += data.count;
-      if(execTotals[data.executive] < 0) execTotals[data.executive] = 0; // no negative totals
-
-      // Daily/weekly/monthly
-      if(formatDate(date) === formatDate(now)) totalToday += data.count;
-      if(date >= startOfWeek) totalWeek += data.count;
-      if(date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) totalMonth += data.count;
+      if(d>=start && d<=end){
+        rows.push([
+          data.executive,
+          data.count,
+          d,
+          date.toLocaleTimeString()
+        ]);
+      }
     });
 
-    // Update UI
-    executives.forEach(exec => document.getElementById(`count-${exec}`).textContent = execTotals[exec]);
-    document.getElementById('totalToday').textContent = totalToday < 0 ? 0 : totalToday;
-    document.getElementById('totalWeek').textContent = totalWeek < 0 ? 0 : totalWeek;
-    document.getElementById('totalMonth').textContent = totalMonth < 0 ? 0 : totalMonth;
-  }
-
-  // Listen live changes
-  db.ref('walkins').on('value', updateTotals);
-
-  // Export Excel
-  function exportData(){
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    if(!startDate || !endDate) return alert("Select both dates");
-
-    db.ref('walkins').once('value').then(snapshot=>{
-      const rows = [["Executive","Count","Date","Time"]];
-      snapshot.forEach(child=>{
-        const data = child.val();
-        const date = new Date(data.timestamp);
-        const dateStr = date.toISOString().split("T")[0];
-        if(dateStr >= startDate && dateStr <= endDate){
-          const timeStr = date.toLocaleTimeString();
-          rows.push([data.executive, data.count, dateStr, timeStr]);
-        }
-      });
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Walkins");
-      XLSX.writeFile(wb, "Walkins.xlsx");
-    });
-  }
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Walkins");
+    XLSX.writeFile(wb,"Walkins.xlsx");
+  });
+}
 </script>
+
+<footer style="
+  text-align:center;
+  margin-top:50px;
+  padding-top:15px;
+  border-top:1px solid #ddd;
+  color:#888;
+  font-size:13px;">
+  © 2026 Hesper. All rights reserved.
+</footer>
 
 </body>
 </html>
