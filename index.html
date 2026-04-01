@@ -13,33 +13,55 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; transition: 0.3s; }
 h1 { text-align: center; margin-bottom: 10px; }
 
-/* 🔥 BIG DATE TIME DISPLAY */
-#datetime {
-  text-align: center;
-  margin-bottom: 25px;
+/* 🔥 TOP CONTROLS */
+.top-controls {
+  position: absolute;
+  top: 15px;
+  right: 20px;
 }
 
-#day {
-  font-size: 26px;
-  font-weight: 600;
-  color: #555;
+.top-controls button {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #2c3e50;
+  color: white;
+  cursor: pointer;
 }
 
-#date {
-  font-size: 22px;
-  color: #777;
+.top-controls button:hover { opacity: 0.8; }
+
+/* 🔥 DARK MODE */
+body.dark {
+  background: #1e1e1e;
+  color: #eee;
 }
 
-#time {
-  font-size: 40px;
-  font-weight: bold;
-  color: #2c3e50;
-  letter-spacing: 2px;
+body.dark .card,
+body.dark .totals div,
+body.dark .export-section {
+  background: #2b2b2b;
+  color: #eee;
 }
 
+body.dark h3 { color: #ccc; }
+
+/* 🔥 DATE TIME */
+#datetime { text-align: center; margin-bottom: 25px; }
+#day { font-size: 26px; color: #555; }
+#date { font-size: 22px; color: #777; }
+#time { font-size: 40px; font-weight: bold; color: #2c3e50; }
+
+body.dark #day,
+body.dark #date { color: #bbb; }
+
+body.dark #time { color: #00ffcc; }
+
+/* EXISTING */
 .totals { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
 .totals div { background: white; padding: 15px 20px; border-radius: 10px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
 .totals h3 { margin: 0; font-size: 14px; color: #555; }
@@ -57,12 +79,7 @@ h1 { text-align: center; margin-bottom: 10px; }
 
 .card h3 { margin: 0 0 10px; font-size: 14px; }
 
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
+.controls { display: flex; justify-content: center; align-items: center; gap: 10px; }
 
 .controls button {
   width: 35px;
@@ -77,11 +94,7 @@ h1 { text-align: center; margin-bottom: 10px; }
 
 .controls button:hover { background: #1f618d; }
 
-.count {
-  font-size: 18px;
-  font-weight: bold;
-  min-width: 30px;
-}
+.count { font-size: 18px; font-weight: bold; min-width: 30px; }
 
 .export-section {
   background: white;
@@ -93,10 +106,7 @@ h1 { text-align: center; margin-bottom: 10px; }
   text-align: center;
 }
 
-.export-section input {
-  padding: 8px;
-  margin: 5px;
-}
+.export-section input { padding: 8px; margin: 5px; }
 
 .export-section button {
   padding: 10px 15px;
@@ -111,18 +121,21 @@ h1 { text-align: center; margin-bottom: 10px; }
 
 @media(max-width:500px){
   h1 { font-size: 18px; }
-
-  #day { font-size: 20px; }
-  #date { font-size: 18px; }
   #time { font-size: 28px; }
 }
 </style>
 </head>
+
 <body>
+
+<!-- 🔥 CONTROLS -->
+<div class="top-controls">
+  <button onclick="toggleDark()">🌙</button>
+  <button onclick="goFullScreen()">⛶</button>
+</div>
 
 <h1>Fujairah Showroom Walk-in Tracker</h1>
 
-<!-- 🔥 DATE TIME DISPLAY -->
 <div id="datetime">
   <div id="day"></div>
   <div id="date"></div>
@@ -147,7 +160,7 @@ h1 { text-align: center; margin-bottom: 10px; }
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyCnFfEuXiPieUC7e--k-GJg9XYKas0CeFo",
+  apiKey: "AIzaSy...",
   authDomain: "walkins-1075c.firebaseapp.com",
   databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
   projectId: "walkins-1075c",
@@ -163,27 +176,33 @@ const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
 const totals = {};
 const grid = document.getElementById("grid");
 
-/* 🔥 LIVE DATE TIME */
+/* 🔥 DATE TIME */
 function updateDateTime(){
   const now = new Date();
-
-  document.getElementById("day").innerText =
-    now.toLocaleDateString('en-US', { weekday: 'long' });
-
-  document.getElementById("date").innerText =
-    now.toLocaleDateString('en-GB');
-
-  document.getElementById("time").innerText =
-    now.toLocaleTimeString();
+  day.innerText = now.toLocaleDateString('en-US', { weekday: 'long' });
+  date.innerText = now.toLocaleDateString('en-GB');
+  time.innerText = now.toLocaleTimeString();
 }
-
 setInterval(updateDateTime, 1000);
 updateDateTime();
+
+/* 🔥 DARK MODE */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+/* 🔥 FULLSCREEN */
+function goFullScreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
 
 // Create UI
 executives.forEach(name => {
   totals[name] = 0;
-
   const div = document.createElement("div");
   div.className = "card";
   div.innerHTML = `
@@ -197,7 +216,7 @@ executives.forEach(name => {
   grid.appendChild(div);
 });
 
-// Add / subtract
+// Update
 function update(name, value){
   if(value < 0 && !confirm("Reduce count?")) return;
 
@@ -208,7 +227,7 @@ function update(name, value){
   });
 }
 
-// Live update
+// Live totals
 db.ref("walkins").on("value", snap => {
   let d=0,w=0,m=0;
 
@@ -235,15 +254,15 @@ db.ref("walkins").on("value", snap => {
     document.getElementById(e).innerText = totals[e];
   });
 
-  document.getElementById("daily").innerText = Math.max(0,d);
-  document.getElementById("weekly").innerText = Math.max(0,w);
-  document.getElementById("monthly").innerText = Math.max(0,m);
+  daily.innerText = Math.max(0,d);
+  weekly.innerText = Math.max(0,w);
+  monthly.innerText = Math.max(0,m);
 });
 
-// Export Excel
+// Export
 function exportData(){
-  const start = document.getElementById("startDate").value;
-  const end = document.getElementById("endDate").value;
+  const start = startDate.value;
+  const end = endDate.value;
 
   if(!start || !end) return alert("Select dates");
 
@@ -273,13 +292,7 @@ function exportData(){
 }
 </script>
 
-<footer style="
-  text-align:center;
-  margin-top:50px;
-  padding-top:15px;
-  border-top:1px solid #ddd;
-  color:#888;
-  font-size:13px;">
+<footer style="text-align:center;margin-top:50px;padding-top:15px;border-top:1px solid #ddd;color:#888;font-size:13px;">
   © 2026 Hesper. All rights reserved.
 </footer>
 
