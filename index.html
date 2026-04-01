@@ -14,7 +14,31 @@
 
 <style>
 body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
-h1 { text-align: center; margin-bottom: 25px; }
+h1 { text-align: center; margin-bottom: 10px; }
+
+/* 🔥 BIG DATE TIME DISPLAY */
+#datetime {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+#day {
+  font-size: 26px;
+  font-weight: 600;
+  color: #555;
+}
+
+#date {
+  font-size: 22px;
+  color: #777;
+}
+
+#time {
+  font-size: 40px;
+  font-weight: bold;
+  color: #2c3e50;
+  letter-spacing: 2px;
+}
 
 .totals { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
 .totals div { background: white; padding: 15px 20px; border-radius: 10px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
@@ -87,12 +111,23 @@ h1 { text-align: center; margin-bottom: 25px; }
 
 @media(max-width:500px){
   h1 { font-size: 18px; }
+
+  #day { font-size: 20px; }
+  #date { font-size: 18px; }
+  #time { font-size: 28px; }
 }
 </style>
 </head>
 <body>
 
 <h1>Fujairah Showroom Walk-in Tracker</h1>
+
+<!-- 🔥 DATE TIME DISPLAY -->
+<div id="datetime">
+  <div id="day"></div>
+  <div id="date"></div>
+  <div id="time"></div>
+</div>
 
 <div class="totals">
   <div><h3>Daily</h3><span id="daily">0</span></div>
@@ -127,6 +162,23 @@ const db = firebase.database();
 const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
 const totals = {};
 const grid = document.getElementById("grid");
+
+/* 🔥 LIVE DATE TIME */
+function updateDateTime(){
+  const now = new Date();
+
+  document.getElementById("day").innerText =
+    now.toLocaleDateString('en-US', { weekday: 'long' });
+
+  document.getElementById("date").innerText =
+    now.toLocaleDateString('en-GB');
+
+  document.getElementById("time").innerText =
+    now.toLocaleTimeString();
+}
+
+setInterval(updateDateTime, 1000);
+updateDateTime();
 
 // Create UI
 executives.forEach(name => {
