@@ -1,300 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fujairah Showroom Walk-in Tracker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fujairah Showroom Walk-in Tracker</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-<!-- SheetJS -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; transition: 0.3s; }
-h1 { text-align: center; margin-bottom: 10px; }
+    <style>
+        :root {
+            --primary: #4361ee;
+            --bg: #f8f9fc;
+            --card-bg: #ffffff;
+            --text: #2b2d42;
+            --danger: #ef233c;
+        }
 
-/* 🔥 TOP CONTROLS */
-.top-controls {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-}
+        body.dark {
+            --bg: #0b090a;
+            --card-bg: #161a1d;
+            --text: #f5f3f4;
+            --primary: #4cc9f0;
+        }
 
-.top-controls button {
-  margin-left: 8px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #2c3e50;
-  color: white;
-  cursor: pointer;
-}
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            margin: 0; padding: 20px; 
+            transition: 0.3s;
+            overflow-x: hidden;
+        }
 
-.top-controls button:hover { opacity: 0.8; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-/* 🔥 DARK MODE */
-body.dark {
-  background: #1e1e1e;
-  color: #eee;
-}
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .top-controls button {
+            background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1);
+            padding: 10px; border-radius: 10px; cursor: pointer; margin-left: 8px;
+        }
 
-body.dark .card,
-body.dark .totals div,
-body.dark .export-section {
-  background: #2b2b2b;
-  color: #eee;
-}
+        #datetime { text-align: center; margin-bottom: 20px; }
+        #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; }
+        #date-info { font-size: 1.2rem; opacity: 0.7; }
 
-body.dark h3 { color: #ccc; }
+        .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { 
+            background: var(--card-bg); padding: 15px; border-radius: 15px; text-align: center; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-bottom: 4px solid var(--primary);
+        }
+        .stat-card h3 { margin: 0; font-size: 0.8rem; opacity: 0.6; text-transform: uppercase; }
+        .stat-card span { font-size: 2rem; font-weight: 800; }
 
-/* 🔥 DATE TIME */
-#datetime { text-align: center; margin-bottom: 25px; }
-#day { font-size: 26px; color: #555; }
-#date { font-size: 22px; color: #777; }
-#time { font-size: 40px; font-weight: bold; color: #2c3e50; }
+        .executives { 
+            display: flex; flex-wrap: wrap; justify-content: center; 
+            gap: 12px; padding-bottom: 30px; 
+        }
 
-body.dark #day,
-body.dark #date { color: #bbb; }
+        .card {
+            background: var(--card-bg); padding: 15px; border-radius: 15px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            flex: 1 1 150px; max-width: 180px; min-width: 130px;
+        }
+        .card h3 { margin: 0 0 10px; font-size: 1rem; }
+        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 10px; }
+        .controls button { width: 35px; height: 35px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 1.2rem; }
+        .count { font-size: 1.3rem; font-weight: 700; width: 40px; }
 
-body.dark #time { color: #00ffcc; }
+        .chart-wrapper {
+            background: var(--card-bg); padding: 20px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;
+            height: 350px; 
+            position: relative;
+        }
 
-/* EXISTING */
-.totals { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
-.totals div { background: white; padding: 15px 20px; border-radius: 10px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
-.totals h3 { margin: 0; font-size: 14px; color: #555; }
-.totals span { font-size: 20px; font-weight: bold; color: #2c3e50; }
+        #adminPanel {
+            position: fixed; right: -350px; top: 0; width: 300px; height: 100%;
+            background: var(--card-bg); box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            transition: 0.4s; z-index: 1000; padding: 30px;
+        }
+        #adminPanel.active { right: 0; }
+        .admin-lock-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
 
-.executives { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+        .locked-tag { color: var(--danger); font-size: 0.7rem; font-weight: bold; display: block; }
 
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-
-.card h3 { margin: 0 0 10px; font-size: 14px; }
-
-.controls { display: flex; justify-content: center; align-items: center; gap: 10px; }
-
-.controls button {
-  width: 35px;
-  height: 35px;
-  border: none;
-  border-radius: 8px;
-  background: #2980b9;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.controls button:hover { background: #1f618d; }
-
-.count { font-size: 18px; font-weight: bold; min-width: 30px; }
-
-.export-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-  max-width: 500px;
-  margin: 30px auto;
-  text-align: center;
-}
-
-.export-section input { padding: 8px; margin: 5px; }
-
-.export-section button {
-  padding: 10px 15px;
-  border: none;
-  background: #2980b9;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.export-section button:hover { background: #1f618d; }
-
-@media(max-width:500px){
-  h1 { font-size: 18px; }
-  #time { font-size: 28px; }
-}
-</style>
+        @media (max-width: 600px) {
+            #time { font-size: 2.5rem; }
+            .totals { gap: 10px; }
+            .stat-card span { font-size: 1.5rem; }
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- 🔥 CONTROLS -->
-<div class="top-controls">
-  <button onclick="toggleDark()">🌙</button>
-  <button onclick="goFullScreen()">⛶</button>
+<div class="container">
+    <header>
+        <h2 style="margin:0;">RAK <span style="color:var(--primary)">Fujairah Showroom</span></h2>
+        <div class="top-controls">
+            <button onclick="toggleDark()">🌓</button>
+            <button onclick="openAdmin()">⚙️</button>
+            <button onclick="goFullScreen()">⛶</button>
+        </div>
+    </header>
+
+    <div id="datetime">
+        <div id="date-info"><span id="day"></span>, <span id="date"></span></div>
+        <h1 id="time">00:00:00</h1>
+    </div>
+
+    <div class="totals">
+        <div class="stat-card"><h3>Daily</h3><span id="daily">0</span></div>
+        <div class="stat-card"><h3>Weekly</h3><span id="weekly">0</span></div>
+        <div class="stat-card"><h3>Monthly</h3><span id="monthly">0</span></div>
+    </div>
+
+    <div class="executives" id="grid"></div>
+
+    <div class="chart-wrapper">
+        <h3 style="margin-top:0">Monthly Performance Trend</h3>
+        <canvas id="walkinChart"></canvas>
+    </div>
+
+    <div style="text-align:center; padding: 20px; background: var(--card-bg); border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        <input type="date" id="startDate" style="padding:8px;"> to 
+        <input type="date" id="endDate" style="padding:8px;">
+        <button onclick="exportData()" style="padding:8px 15px; background:var(--primary); color:white; border:none; border-radius:5px; cursor:pointer; margin-left:10px;">Export Excel</button>
+    </div>
 </div>
 
-<h1>Fujairah Showroom Walk-in Tracker</h1>
-
-<div id="datetime">
-  <div id="day"></div>
-  <div id="date"></div>
-  <div id="time"></div>
-</div>
-
-<div class="totals">
-  <div><h3>Daily</h3><span id="daily">0</span></div>
-  <div><h3>Weekly</h3><span id="weekly">0</span></div>
-  <div><h3>Monthly</h3><span id="monthly">0</span></div>
-</div>
-
-<div class="executives" id="grid"></div>
-
-<div class="export-section">
-  <h3>Export Data</h3>
-  <input type="date" id="startDate"> to 
-  <input type="date" id="endDate">
-  <br><br>
-  <button onclick="exportData()">Export Excel</button>
+<div id="adminPanel">
+    <h3>Staff Management</h3>
+    <div id="lockList"></div>
+    <button onclick="closeAdmin()" style="width:100%; padding:10px; margin-top:20px; border-radius:8px; border:none; background:#eee; cursor:pointer;">Close</button>
 </div>
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "walkins-1075c.firebaseapp.com",
-  databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
-  projectId: "walkins-1075c",
-  storageBucket: "walkins-1075c.firebasestorage.app",
-  messagingSenderId: "120467264924",
-  appId: "1:120467264924:web:1720f66ad02dacfb53e459"
+    apiKey: "AIzaSy...", 
+    authDomain: "walkins-1075c.firebaseapp.com",
+    databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
+    projectId: "walkins-1075c"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
-const totals = {};
-const grid = document.getElementById("grid");
+const lockedUsers = {};
+let walkinChart;
 
-/* 🔥 DATE TIME */
-function updateDateTime(){
-  const now = new Date();
-  day.innerText = now.toLocaleDateString('en-US', { weekday: 'long' });
-  date.innerText = now.toLocaleDateString('en-GB');
-  time.innerText = now.toLocaleTimeString();
-}
-setInterval(updateDateTime, 1000);
-updateDateTime();
-
-/* 🔥 DARK MODE */
-function toggleDark(){
-  document.body.classList.toggle("dark");
-}
-
-/* 🔥 FULLSCREEN */
-function goFullScreen(){
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-}
-
-// Create UI
 executives.forEach(name => {
-  totals[name] = 0;
-  const div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = `
-    <h3>${name}</h3>
-    <div class="controls">
-      <button onclick="update('${name}', -1)">−</button>
-      <span class="count" id="${name}">0</span>
-      <button onclick="update('${name}', 1)">+</button>
-    </div>
-  `;
-  grid.appendChild(div);
+    const div = document.createElement("div");
+    div.className = "card"; div.id = `card-${name}`;
+    div.innerHTML = `<h3 id="label-${name}">${name}</h3>
+        <div class="controls">
+            <button onclick="update('${name}', -1)">−</button>
+            <span class="count" id="${name}">0</span>
+            <button onclick="update('${name}', 1)">+</button>
+        </div>`;
+    document.getElementById("grid").appendChild(div);
 });
 
-// Update
-function update(name, value){
-  if(value < 0 && !confirm("Reduce count?")) return;
+function updateDateTime(){
+    const now = new Date();
+    document.getElementById('day').innerText = now.toLocaleDateString('en-US', { weekday: 'long' });
+    document.getElementById('date').innerText = now.toLocaleDateString('en-GB');
+    document.getElementById('time').innerText = now.toLocaleTimeString([], { hour12: false });
+}
+setInterval(updateDateTime, 1000); updateDateTime();
 
-  db.ref("walkins").push({
-    executive: name,
-    count: value,
-    timestamp: Date.now()
-  });
+function openAdmin() { if(prompt("Enter PIN:") === "7255") { renderAdminList(); document.getElementById("adminPanel").classList.add("active"); } }
+function closeAdmin() { document.getElementById("adminPanel").classList.remove("active"); }
+
+function renderAdminList() {
+    const list = document.getElementById("lockList"); list.innerHTML = "";
+    executives.forEach(name => {
+        const isLocked = lockedUsers[name] || false;
+        list.innerHTML += `<div class="admin-lock-item"><span>${name}</span>
+            <button onclick="toggleLock('${name}')" style="background:${isLocked ? '#ef233c' : '#06d6a0'}; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
+            ${isLocked ? 'Locked' : 'Active'}</button></div>`;
+    });
 }
 
-// Live totals
-db.ref("walkins").on("value", snap => {
-  let d=0,w=0,m=0;
+function toggleLock(name) { db.ref("locks/" + name).set(!lockedUsers[name]).then(() => renderAdminList()); }
 
-  executives.forEach(e => totals[e]=0);
-
-  const now = new Date();
-  const weekStart = new Date();
-  weekStart.setDate(now.getDate()-now.getDay());
-  weekStart.setHours(0,0,0,0);
-
-  snap.forEach(child=>{
-    const data = child.val();
-    const date = new Date(data.timestamp);
-
-    totals[data.executive]+=data.count;
-    if(totals[data.executive]<0) totals[data.executive]=0;
-
-    if(date.toDateString()===now.toDateString()) d+=data.count;
-    if(date>=weekStart) w+=data.count;
-    if(date.getMonth()===now.getMonth()) m+=data.count;
-  });
-
-  executives.forEach(e=>{
-    document.getElementById(e).innerText = totals[e];
-  });
-
-  daily.innerText = Math.max(0,d);
-  weekly.innerText = Math.max(0,w);
-  monthly.innerText = Math.max(0,m);
+db.ref("locks").on("value", snap => {
+    const data = snap.val() || {};
+    executives.forEach(name => {
+        lockedUsers[name] = data[name] || false;
+        const card = document.getElementById(`card-${name}`);
+        const label = document.getElementById(`label-${name}`);
+        if(lockedUsers[name]) { card.classList.add("locked"); label.innerHTML = `${name} <span class="locked-tag">OFF DUTY</span>`; }
+        else { card.classList.remove("locked"); label.innerHTML = name; }
+    });
 });
 
-// Export
-function exportData(){
-  const start = startDate.value;
-  const end = endDate.value;
+db.ref("walkins").on("value", snap => {
+    let d=0, w=0, m=0;
+    const monthlyCounts = {}; const dailyData = {};
+    executives.forEach(e => monthlyCounts[e] = 0);
+    
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
 
-  if(!start || !end) return alert("Select dates");
+    const weekStart = new Date();
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0,0,0,0);
 
-  db.ref("walkins").once("value").then(snap=>{
-    const rows=[["Executive","Count","Date","Time"]];
+    snap.forEach(child => {
+        const data = child.val(); 
+        const date = new Date(data.timestamp);
+        
+        // 1. Daily
+        if(date.toDateString() === now.toDateString()) d += data.count;
+        
+        // 2. Weekly (Independent of month rollover)
+        if(date >= weekStart) w += data.count;
 
-    snap.forEach(child=>{
-      const data=child.val();
-      const date=new Date(data.timestamp);
-      const d=date.toISOString().split("T")[0];
-
-      if(d>=start && d<=end){
-        rows.push([
-          data.executive,
-          data.count,
-          d,
-          date.toLocaleTimeString()
-        ]);
-      }
+        // 3. Monthly & Chart
+        if(date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+            m += data.count; 
+            monthlyCounts[data.executive] += data.count;
+            dailyData[date.getDate()] = (dailyData[date.getDate()] || 0) + data.count;
+        }
     });
 
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Walkins");
-    XLSX.writeFile(wb,"Walkins.xlsx");
-  });
+    executives.forEach(e => document.getElementById(e).innerText = monthlyCounts[e]);
+    document.getElementById("daily").innerText = Math.max(0, d);
+    document.getElementById("weekly").innerText = Math.max(0, w);
+    document.getElementById("monthly").innerText = Math.max(0, m);
+    updateChart(dailyData);
+});
+
+function updateChart(dailyData) {
+    const days = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const labels = Array.from({length: days}, (_, i) => i + 1);
+    const dataset = labels.map(day => dailyData[day] || 0);
+
+    if (walkinChart) walkinChart.destroy();
+    walkinChart = new Chart(document.getElementById('walkinChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'Walkins', data: dataset, borderColor: '#4361ee', backgroundColor: 'rgba(67, 97, 238, 0.1)', fill: true, tension: 0.3 }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+function update(name, val) { if(!lockedUsers[name]) db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); }
+function toggleDark(){ document.body.classList.toggle("dark"); }
+function goFullScreen(){ if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+
+function exportData(){
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
+    if(!start || !end) return alert("Select dates");
+    db.ref("walkins").once("value").then(snap => {
+        const rows = [["Executive", "Count", "Date", "Time"]];
+        snap.forEach(child => {
+            const data = child.val(); 
+            const date = new Date(data.timestamp);
+            const dStr = date.toISOString().split("T")[0];
+            if(dStr >= start && dStr <= end) rows.push([data.executive, data.count, dStr, date.toLocaleTimeString()]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows); const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Report.xlsx");
+    });
 }
 </script>
-
-<footer style="text-align:center;margin-top:50px;padding-top:15px;border-top:1px solid #ddd;color:#888;font-size:13px;">
-  © 2026 Hesper. All rights reserved.
-</footer>
-
 </body>
 </html>
