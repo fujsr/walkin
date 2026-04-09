@@ -13,26 +13,29 @@
 
     <style>
         :root {
-            --primary: #4361ee;
-            --bg: #f8f9fc;
+            /* 🔥 DARK TEAL PALETTE */
+            --primary: #006666; 
+            --primary-light: rgba(0, 102, 102, 0.1);
+            --bg: #f4f7f6;
             --card-bg: #ffffff;
-            --text: #2b2d42;
-            --danger: #ef233c;
+            --text: #1a2a2a;
+            --danger: #d90429;
         }
 
         body.dark {
-            --bg: #0b090a;
-            --card-bg: #161a1d;
-            --text: #f5f3f4;
-            --primary: #4cc9f0;
+            --bg: #050a0a;
+            --card-bg: #0f1a1a;
+            --text: #e0f2f2;
+            --primary: #00a8a8; /* Slightly brighter for dark mode visibility */
+            --primary-light: rgba(0, 168, 168, 0.15);
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', -apple-system, sans-serif; 
             background: var(--bg); 
             color: var(--text);
             margin: 0; padding: 20px; 
-            transition: 0.3s;
+            transition: background 0.3s, color 0.3s;
             overflow-x: hidden;
         }
 
@@ -41,58 +44,63 @@
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .top-controls button {
             background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1);
-            padding: 10px; border-radius: 10px; cursor: pointer; margin-left: 8px;
+            padding: 10px; border-radius: 10px; cursor: pointer; margin-left: 8px; font-size: 1.1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         #datetime { text-align: center; margin-bottom: 20px; }
-        #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; }
-        #date-info { font-size: 1.2rem; opacity: 0.7; }
+        #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -1px; }
+        #date-info { font-size: 1.2rem; opacity: 0.8; font-weight: 500; }
 
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { 
-            background: var(--card-bg); padding: 15px; border-radius: 15px; text-align: center; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-bottom: 4px solid var(--primary);
+            background: var(--card-bg); padding: 18px; border-radius: 15px; text-align: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); border-bottom: 5px solid var(--primary);
         }
-        .stat-card h3 { margin: 0; font-size: 0.8rem; opacity: 0.6; text-transform: uppercase; }
-        .stat-card span { font-size: 2rem; font-weight: 800; }
+        .stat-card h3 { margin: 0; font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card span { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
 
         .executives { 
             display: flex; flex-wrap: wrap; justify-content: center; 
-            gap: 12px; padding-bottom: 30px; 
+            gap: 15px; padding-bottom: 30px; 
         }
 
         .card {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            flex: 1 1 150px; max-width: 180px; min-width: 130px;
+            background: var(--card-bg); padding: 15px; border-radius: 18px;
+            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            flex: 1 1 150px; max-width: 180px; min-width: 135px;
+            transition: transform 0.2s;
         }
-        .card h3 { margin: 0 0 10px; font-size: 1rem; }
-        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 10px; }
-        .controls button { width: 35px; height: 35px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 1.2rem; }
-        .count { font-size: 1.3rem; font-weight: 700; width: 40px; }
+        .card:hover { transform: translateY(-3px); }
+        .card h3 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
+        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 12px; }
+        .controls button { width: 38px; height: 38px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font-size: 1.3rem; transition: opacity 0.2s; }
+        .controls button:active { opacity: 0.7; }
+        .count { font-size: 1.4rem; font-weight: 700; width: 40px; }
 
         .chart-wrapper {
-            background: var(--card-bg); padding: 20px; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;
-            height: 350px; 
+            background: var(--card-bg); padding: 25px; border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin-bottom: 30px;
+            height: 380px; 
             position: relative;
         }
 
         #adminPanel {
             position: fixed; right: -350px; top: 0; width: 300px; height: 100%;
-            background: var(--card-bg); box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-            transition: 0.4s; z-index: 1000; padding: 30px;
+            background: var(--card-bg); box-shadow: -15px 0 35px rgba(0,0,0,0.15);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); z-index: 1000; padding: 30px;
         }
         #adminPanel.active { right: 0; }
-        .admin-lock-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .admin-lock-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); }
 
         .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .locked-tag { color: var(--danger); font-size: 0.7rem; font-weight: bold; display: block; }
+        .locked-tag { color: var(--danger); font-size: 0.7rem; font-weight: 800; display: block; margin-top: 2px; }
 
         @media (max-width: 600px) {
-            #time { font-size: 2.5rem; }
+            #time { font-size: 2.8rem; }
             .totals { gap: 10px; }
-            .stat-card span { font-size: 1.5rem; }
+            .stat-card span { font-size: 1.6rem; }
+            body { padding: 10px; }
         }
     </style>
 </head>
@@ -101,7 +109,7 @@
 
 <div class="container">
     <header>
-        <h2 style="margin:0;">RAK <span style="color:var(--primary)">Fujairah Showroom</span></h2>
+        <h2 style="margin:0; font-weight: 800;">RAK <span style="color:var(--primary)">Fujairah Showroom</span></h2>
         <div class="top-controls">
             <button onclick="toggleDark()">🌓</button>
             <button onclick="openAdmin()">⚙️</button>
@@ -115,32 +123,34 @@
     </div>
 
     <div class="totals">
-        <div class="stat-card"><h3>Daily</h3><span id="daily">0</span></div>
-        <div class="stat-card"><h3>Weekly</h3><span id="weekly">0</span></div>
-        <div class="stat-card"><h3>Monthly</h3><span id="monthly">0</span></div>
+        <div class="stat-card"><h3>Daily Total</h3><span id="daily">0</span></div>
+        <div class="stat-card"><h3>Weekly Total</h3><span id="weekly">0</span></div>
+        <div class="stat-card"><h3>Monthly Total</h3><span id="monthly">0</span></div>
     </div>
 
     <div class="executives" id="grid"></div>
 
     <div class="chart-wrapper">
-        <h3 style="margin-top:0">Monthly Performance Trend</h3>
+        <h3 style="margin-top:0; font-size: 1.1rem;">Monthly Performance Trend</h3>
         <canvas id="walkinChart"></canvas>
     </div>
 
-    <div style="text-align:center; padding: 20px; background: var(--card-bg); border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-        <input type="date" id="startDate" style="padding:8px;"> to 
-        <input type="date" id="endDate" style="padding:8px;">
-        <button onclick="exportData()" style="padding:8px 15px; background:var(--primary); color:white; border:none; border-radius:5px; cursor:pointer; margin-left:10px;">Export Excel</button>
+    <div style="text-align:center; padding: 25px; background: var(--card-bg); border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.04);">
+        <input type="date" id="startDate" style="padding:10px; border: 1px solid #ddd; border-radius: 8px;"> 
+        <span style="margin: 0 10px; font-weight: bold; opacity: 0.5;">TO</span>
+        <input type="date" id="endDate" style="padding:10px; border: 1px solid #ddd; border-radius: 8px;">
+        <button onclick="exportData()" style="padding:10px 25px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; margin-left:15px; font-weight: 600;">Export Excel</button>
     </div>
 </div>
 
 <div id="adminPanel">
-    <h3>Staff Management</h3>
+    <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Staff Management</h3>
     <div id="lockList"></div>
-    <button onclick="closeAdmin()" style="width:100%; padding:10px; margin-top:20px; border-radius:8px; border:none; background:#eee; cursor:pointer;">Close</button>
+    <button onclick="closeAdmin()" style="width:100%; padding:12px; margin-top:25px; border-radius:10px; border:none; background:rgba(0,0,0,0.05); color: var(--text); font-weight: bold; cursor:pointer;">Close Settings</button>
 </div>
 
 <script>
+// --- FIREBASE SETUP ---
 const firebaseConfig = {
     apiKey: "AIzaSy...", 
     authDomain: "walkins-1075c.firebaseapp.com",
@@ -154,6 +164,7 @@ const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
 const lockedUsers = {};
 let walkinChart;
 
+// Generate cards
 executives.forEach(name => {
     const div = document.createElement("div");
     div.className = "card"; div.id = `card-${name}`;
@@ -174,7 +185,8 @@ function updateDateTime(){
 }
 setInterval(updateDateTime, 1000); updateDateTime();
 
-function openAdmin() { if(prompt("Enter PIN:") === "7255") { renderAdminList(); document.getElementById("adminPanel").classList.add("active"); } }
+// --- ADMIN CONTROLS ---
+function openAdmin() { if(prompt("Enter Admin PIN:") === "7255") { renderAdminList(); document.getElementById("adminPanel").classList.add("active"); } }
 function closeAdmin() { document.getElementById("adminPanel").classList.remove("active"); }
 
 function renderAdminList() {
@@ -182,7 +194,7 @@ function renderAdminList() {
     executives.forEach(name => {
         const isLocked = lockedUsers[name] || false;
         list.innerHTML += `<div class="admin-lock-item"><span>${name}</span>
-            <button onclick="toggleLock('${name}')" style="background:${isLocked ? '#ef233c' : '#06d6a0'}; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
+            <button onclick="toggleLock('${name}')" style="background:${isLocked ? '#d90429' : 'var(--primary)'}; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size: 0.8rem;">
             ${isLocked ? 'Locked' : 'Active'}</button></div>`;
     });
 }
@@ -200,15 +212,14 @@ db.ref("locks").on("value", snap => {
     });
 });
 
+// --- DATA PROCESSING ---
 db.ref("walkins").on("value", snap => {
     let d=0, w=0, m=0;
     const monthlyCounts = {}; const dailyData = {};
     executives.forEach(e => monthlyCounts[e] = 0);
-    
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-
     const weekStart = new Date();
     weekStart.setDate(now.getDate() - now.getDay());
     weekStart.setHours(0,0,0,0);
@@ -216,14 +227,8 @@ db.ref("walkins").on("value", snap => {
     snap.forEach(child => {
         const data = child.val(); 
         const date = new Date(data.timestamp);
-        
-        // 1. Daily
         if(date.toDateString() === now.toDateString()) d += data.count;
-        
-        // 2. Weekly (Independent of month rollover)
         if(date >= weekStart) w += data.count;
-
-        // 3. Monthly & Chart
         if(date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
             m += data.count; 
             monthlyCounts[data.executive] += data.count;
@@ -232,41 +237,56 @@ db.ref("walkins").on("value", snap => {
     });
 
     executives.forEach(e => document.getElementById(e).innerText = monthlyCounts[e]);
-    document.getElementById("daily").innerText = Math.max(0, d);
-    document.getElementById("weekly").innerText = Math.max(0, w);
-    document.getElementById("monthly").innerText = Math.max(0, m);
+    document.getElementById("daily").innerText = d;
+    document.getElementById("weekly").innerText = w;
+    document.getElementById("monthly").innerText = m;
     updateChart(dailyData);
 });
 
+// --- CHART LOGIC (Till Date Only) ---
 function updateChart(dailyData) {
-    const days = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    const labels = Array.from({length: days}, (_, i) => i + 1);
+    const now = new Date();
+    const today = now.getDate();
+    const labels = Array.from({length: today}, (_, i) => i + 1);
     const dataset = labels.map(day => dailyData[day] || 0);
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
 
     if (walkinChart) walkinChart.destroy();
     walkinChart = new Chart(document.getElementById('walkinChart'), {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{ label: 'Walkins', data: dataset, borderColor: '#4361ee', backgroundColor: 'rgba(67, 97, 238, 0.1)', fill: true, tension: 0.3 }]
+            datasets: [{ 
+                label: 'Total Walkins', 
+                data: dataset, 
+                borderColor: primaryColor, 
+                backgroundColor: 'rgba(0, 102, 102, 0.1)', 
+                fill: true, 
+                tension: 0.35,
+                pointRadius: 5,
+                pointBackgroundColor: primaryColor,
+                borderWidth: 3
+            }]
         },
         options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
+            responsive: true, maintainAspectRatio: false, 
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
+            scales: { 
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
         }
     });
 }
 
 function update(name, val) { if(!lockedUsers[name]) db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); }
-function toggleDark(){ document.body.classList.toggle("dark"); }
+function toggleDark(){ document.body.classList.toggle("dark"); setTimeout(() => { if(walkinChart) updateChart({}); }, 100); }
 function goFullScreen(){ if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 
 function exportData(){
     const start = document.getElementById("startDate").value;
     const end = document.getElementById("endDate").value;
-    if(!start || !end) return alert("Select dates");
+    if(!start || !end) return alert("Select start and end dates first.");
     db.ref("walkins").once("value").then(snap => {
         const rows = [["Executive", "Count", "Date", "Time"]];
         snap.forEach(child => {
@@ -276,7 +296,7 @@ function exportData(){
             if(dStr >= start && dStr <= end) rows.push([data.executive, data.count, dStr, date.toLocaleTimeString()]);
         });
         const ws = XLSX.utils.aoa_to_sheet(rows); const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Report.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Fujairah_Showroom_Report.xlsx");
     });
 }
 </script>
