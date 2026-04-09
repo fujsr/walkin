@@ -7,15 +7,12 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* 🔥 DARK TEAL PALETTE */
-            --primary: #006666; 
-            --primary-light: rgba(0, 102, 102, 0.1);
+            --primary: #006666; /* Dark Teal */
             --bg: #f4f7f6;
             --card-bg: #ffffff;
             --text: #1a2a2a;
@@ -26,8 +23,7 @@
             --bg: #050a0a;
             --card-bg: #0f1a1a;
             --text: #e0f2f2;
-            --primary: #00a8a8; /* Slightly brighter for dark mode visibility */
-            --primary-light: rgba(0, 168, 168, 0.15);
+            --primary: #00a8a8; /* Brighter Teal for Dark Mode */
         }
 
         body { 
@@ -39,13 +35,29 @@
             overflow-x: hidden;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; position: relative; }
 
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        header { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            position: relative; 
+            padding-top: 10px;
+        }
+        
+        header h2 { margin: 0; font-weight: 800; font-size: 1.8rem; }
+
+        .top-controls {
+            position: absolute; right: 0; top: 10px; display: flex;
+        }
+        
+        @media (max-width: 800px) {
+            .top-controls { position: static; justify-content: center; margin-top: 15px; }
+        }
+
         .top-controls button {
             background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1);
             padding: 10px; border-radius: 10px; cursor: pointer; margin-left: 8px; font-size: 1.1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: var(--text);
         }
 
         #datetime { text-align: center; margin-bottom: 20px; }
@@ -57,51 +69,37 @@
             background: var(--card-bg); padding: 18px; border-radius: 15px; text-align: center; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.04); border-bottom: 5px solid var(--primary);
         }
-        .stat-card h3 { margin: 0; font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card h3 { margin: 0; font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; }
         .stat-card span { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
 
-        .executives { 
-            display: flex; flex-wrap: wrap; justify-content: center; 
-            gap: 15px; padding-bottom: 30px; 
-        }
+        .executives { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding-bottom: 30px; }
 
         .card {
             background: var(--card-bg); padding: 15px; border-radius: 18px;
             text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
             flex: 1 1 150px; max-width: 180px; min-width: 135px;
-            transition: transform 0.2s;
         }
-        .card:hover { transform: translateY(-3px); }
         .card h3 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
         .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 12px; }
-        .controls button { width: 38px; height: 38px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font-size: 1.3rem; transition: opacity 0.2s; }
-        .controls button:active { opacity: 0.7; }
+        .controls button { width: 38px; height: 38px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font-size: 1.3rem; }
         .count { font-size: 1.4rem; font-weight: 700; width: 40px; }
 
         .chart-wrapper {
             background: var(--card-bg); padding: 25px; border-radius: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin-bottom: 30px;
-            height: 380px; 
-            position: relative;
+            height: 380px; position: relative;
         }
 
         #adminPanel {
             position: fixed; right: -350px; top: 0; width: 300px; height: 100%;
             background: var(--card-bg); box-shadow: -15px 0 35px rgba(0,0,0,0.15);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); z-index: 1000; padding: 30px;
+            transition: 0.4s; z-index: 1000; padding: 30px;
         }
         #adminPanel.active { right: 0; }
         .admin-lock-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); }
 
         .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .locked-tag { color: var(--danger); font-size: 0.7rem; font-weight: 800; display: block; margin-top: 2px; }
-
-        @media (max-width: 600px) {
-            #time { font-size: 2.8rem; }
-            .totals { gap: 10px; }
-            .stat-card span { font-size: 1.6rem; }
-            body { padding: 10px; }
-        }
+        .locked-tag { color: var(--danger); font-size: 0.7rem; font-weight: 800; display: block; }
     </style>
 </head>
 
@@ -109,7 +107,7 @@
 
 <div class="container">
     <header>
-        <h2 style="margin:0; font-weight: 800;">RAK <span style="color:var(--primary)">Fujairah Showroom</span></h2>
+        <h2>RAK <span style="color:var(--primary)">Fujairah Showroom</span></h2>
         <div class="top-controls">
             <button onclick="toggleDark()">🌓</button>
             <button onclick="openAdmin()">⚙️</button>
@@ -146,11 +144,11 @@
 <div id="adminPanel">
     <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Staff Management</h3>
     <div id="lockList"></div>
-    <button onclick="closeAdmin()" style="width:100%; padding:12px; margin-top:25px; border-radius:10px; border:none; background:rgba(0,0,0,0.05); color: var(--text); font-weight: bold; cursor:pointer;">Close Settings</button>
+    <button onclick="closeAdmin()" style="width:100%; padding:12px; margin-top:25px; border-radius:10px; border:none; background:rgba(0,0,0,0.05); font-weight: bold; cursor:pointer;">Close</button>
 </div>
 
 <script>
-// --- FIREBASE SETUP ---
+// --- CONFIG (Update with your Firebase Keys) ---
 const firebaseConfig = {
     apiKey: "AIzaSy...", 
     authDomain: "walkins-1075c.firebaseapp.com",
@@ -163,8 +161,9 @@ const db = firebase.database();
 const executives = ["Asmaa","Eme","Maria","Sayeed","Yehia","Richard","Junaid"];
 const lockedUsers = {};
 let walkinChart;
+let lastChartData = {};
 
-// Generate cards
+// UI Generation
 executives.forEach(name => {
     const div = document.createElement("div");
     div.className = "card"; div.id = `card-${name}`;
@@ -185,34 +184,43 @@ function updateDateTime(){
 }
 setInterval(updateDateTime, 1000); updateDateTime();
 
-// --- ADMIN CONTROLS ---
-function openAdmin() { if(prompt("Enter Admin PIN:") === "7255") { renderAdminList(); document.getElementById("adminPanel").classList.add("active"); } }
-function closeAdmin() { document.getElementById("adminPanel").classList.remove("active"); }
+// --- CHART LOGIC ---
+function updateChart(dailyData) {
+    lastChartData = dailyData;
+    const now = new Date();
+    const today = now.getDate();
+    const labels = Array.from({length: today}, (_, i) => i + 1);
+    const dataset = labels.map(day => dailyData[day] || 0);
 
-function renderAdminList() {
-    const list = document.getElementById("lockList"); list.innerHTML = "";
-    executives.forEach(name => {
-        const isLocked = lockedUsers[name] || false;
-        list.innerHTML += `<div class="admin-lock-item"><span>${name}</span>
-            <button onclick="toggleLock('${name}')" style="background:${isLocked ? '#d90429' : 'var(--primary)'}; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size: 0.8rem;">
-            ${isLocked ? 'Locked' : 'Active'}</button></div>`;
+    // Get current theme color from computed style
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    const isDark = document.body.classList.contains('dark');
+
+    if (walkinChart) walkinChart.destroy();
+    walkinChart = new Chart(document.getElementById('walkinChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{ 
+                label: 'Walkins', 
+                data: dataset, 
+                borderColor: primaryColor, 
+                backgroundColor: isDark ? 'rgba(0, 168, 168, 0.15)' : 'rgba(0, 102, 102, 0.1)', 
+                fill: true, tension: 0.35, pointRadius: 5, pointBackgroundColor: primaryColor, borderWidth: 3
+            }]
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { 
+                y: { beginAtZero: true, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: primaryColor } },
+                x: { grid: { display: false }, ticks: { color: primaryColor } }
+            }
+        }
     });
 }
 
-function toggleLock(name) { db.ref("locks/" + name).set(!lockedUsers[name]).then(() => renderAdminList()); }
-
-db.ref("locks").on("value", snap => {
-    const data = snap.val() || {};
-    executives.forEach(name => {
-        lockedUsers[name] = data[name] || false;
-        const card = document.getElementById(`card-${name}`);
-        const label = document.getElementById(`label-${name}`);
-        if(lockedUsers[name]) { card.classList.add("locked"); label.innerHTML = `${name} <span class="locked-tag">OFF DUTY</span>`; }
-        else { card.classList.remove("locked"); label.innerHTML = name; }
-    });
-});
-
-// --- DATA PROCESSING ---
+// --- DATABASE HANDLERS ---
 db.ref("walkins").on("value", snap => {
     let d=0, w=0, m=0;
     const monthlyCounts = {}; const dailyData = {};
@@ -243,50 +251,53 @@ db.ref("walkins").on("value", snap => {
     updateChart(dailyData);
 });
 
-// --- CHART LOGIC (Till Date Only) ---
-function updateChart(dailyData) {
-    const now = new Date();
-    const today = now.getDate();
-    const labels = Array.from({length: today}, (_, i) => i + 1);
-    const dataset = labels.map(day => dailyData[day] || 0);
-    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-
-    if (walkinChart) walkinChart.destroy();
-    walkinChart = new Chart(document.getElementById('walkinChart'), {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{ 
-                label: 'Total Walkins', 
-                data: dataset, 
-                borderColor: primaryColor, 
-                backgroundColor: 'rgba(0, 102, 102, 0.1)', 
-                fill: true, 
-                tension: 0.35,
-                pointRadius: 5,
-                pointBackgroundColor: primaryColor,
-                borderWidth: 3
-            }]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false, 
-            plugins: { legend: { display: false } },
-            scales: { 
-                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-                x: { grid: { display: false } }
-            }
+// Admin and Lock listeners
+db.ref("locks").on("value", snap => {
+    const data = snap.val() || {};
+    executives.forEach(name => {
+        lockedUsers[name] = data[name] || false;
+        const card = document.getElementById(`card-${name}`);
+        const label = document.getElementById(`label-${name}`);
+        if(lockedUsers[name]) { 
+            card.classList.add("locked"); 
+            label.innerHTML = `${name} <span class="locked-tag">OFF DUTY</span>`; 
+        } else { 
+            card.classList.remove("locked"); 
+            label.innerHTML = name; 
         }
     });
+});
+
+// --- UI ACTIONS ---
+function toggleDark(){ 
+    document.body.classList.toggle("dark");
+    // Small delay to allow CSS variables to settle
+    setTimeout(() => updateChart(lastChartData), 50);
 }
 
-function update(name, val) { if(!lockedUsers[name]) db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); }
-function toggleDark(){ document.body.classList.toggle("dark"); setTimeout(() => { if(walkinChart) updateChart({}); }, 100); }
+function update(name, val) { 
+    if(!lockedUsers[name]) db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
+}
+
+function openAdmin() { if(prompt("Enter PIN:") === "7255") { renderAdminList(); document.getElementById("adminPanel").classList.add("active"); } }
+function closeAdmin() { document.getElementById("adminPanel").classList.remove("active"); }
+
+function renderAdminList() {
+    const list = document.getElementById("lockList"); list.innerHTML = "";
+    executives.forEach(name => {
+        const isLocked = lockedUsers[name] || false;
+        list.innerHTML += `<div class="admin-lock-item"><span>${name}</span>
+            <button onclick="toggleLock('${name}')" style="background:${isLocked ? '#d90429' : 'var(--primary)'}; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
+            ${isLocked ? 'Locked' : 'Active'}</button></div>`;
+    });
+}
+function toggleLock(name) { db.ref("locks/" + name).set(!lockedUsers[name]).then(() => renderAdminList()); }
 function goFullScreen(){ if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 
 function exportData(){
     const start = document.getElementById("startDate").value;
     const end = document.getElementById("endDate").value;
-    if(!start || !end) return alert("Select start and end dates first.");
+    if(!start || !end) return alert("Select dates.");
     db.ref("walkins").once("value").then(snap => {
         const rows = [["Executive", "Count", "Date", "Time"]];
         snap.forEach(child => {
@@ -296,7 +307,7 @@ function exportData(){
             if(dStr >= start && dStr <= end) rows.push([data.executive, data.count, dStr, date.toLocaleTimeString()]);
         });
         const ws = XLSX.utils.aoa_to_sheet(rows); const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Fujairah_Showroom_Report.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Report.xlsx");
     });
 }
 </script>
