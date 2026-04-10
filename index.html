@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fujairah Showroom Tracker</title>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
             --primary: #006666; 
@@ -19,22 +17,18 @@
             --card-bg: #ffffff;
             --text-main: #1a2a2a;
             --rak-text: #1a2a2a;
-            /* APPEAL COLOR FOR FUJAIRAH (Light Mode) */
             --fujairah-color: #1a2a2a; 
             --shadow-soft: 0 10px 30px rgba(0, 102, 102, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         body.dark {
             --bg: #050a0a;
             --card-bg: #0f1a1a;
             --text-main: #e0f2f2;
             --rak-text: #ffffff;
             --primary: #00a8a8;
-            /* APPEAL COLOR FOR FUJAIRAH (Dark Mode) */
             --fujairah-color: #ffffff; 
         }
-
         body { 
             font-family: 'Inter', -apple-system, sans-serif; 
             background: var(--bg); 
@@ -43,17 +37,13 @@
             transition: background 0.3s, color 0.3s;
             overflow-x: hidden;
         }
-
         .container { max-width: 1400px; margin: 0 auto; }
-
         header { 
             text-align: center; 
             margin-bottom: 20px; 
             position: relative; 
             padding-top: 10px;
         }
-
-        /* RAK IN LEFT CORNER */
         .rak-left {
             position: absolute;
             left: 0;
@@ -63,8 +53,6 @@
             color: var(--rak-text);
             letter-spacing: -1.5px;
         }
-        
-        /* FUJAIRAH SHOWROOM CENTERED WITH NEW COLOR */
         .showroom-title { 
             font-size: 2.4rem; 
             font-weight: 800; 
@@ -74,7 +62,6 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
             transition: color 0.3s ease;
         }
-
         .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 10px; }
         .btn-tool {
             width: 36px; height: 36px; border-radius: 12px; border: none;
@@ -82,11 +69,9 @@
             box-shadow: var(--shadow-soft); transition: var(--transition);
             color: var(--primary); font-size: 1.1rem;
         }
-
         #datetime { text-align: center; margin-bottom: 20px; }
         #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -1px; }
         #date-info { font-size: 1.2rem; opacity: 0.8; font-weight: 500; }
-
         .peak-container { display: flex; justify-content: center; margin-bottom: 20px; }
         .peak-card {
             background: var(--card-bg);
@@ -98,31 +83,23 @@
         }
         .peak-card h4 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; letter-spacing: 1px; }
         .peak-card div { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
-
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { 
-            background: var(--card-bg); padding: 18px; border-radius: 15px; text-align: center; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04); border-bottom: 5px solid var(--primary);
-        }}
         .stat-card { 
             background: var(--card-bg); padding: 25px; border-radius: 28px; text-align: center; 
             box-shadow: var(--shadow-soft); border-bottom: 6px solid var(--primary);
         }
         .stat-card h3 { margin: 0 0 5px 0; font-size: 0.9rem; text-transform: uppercase; opacity: 0.6; font-weight: 600; }
         .stat-card span { font-size: 2.5rem; font-weight: 900; color: var(--primary); }
-
         .executives { 
             display: grid; grid-template-columns: repeat(7, 1fr); 
             gap: 15px; margin-bottom: 40px; width: 100%;
         }
-        
         .card {
             background: var(--card-bg); padding: 20px 10px; border-radius: 26px;
             box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.02);
             text-align: center;
         }
         .card h3 { margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; }
-
         .controls { 
             display: flex; align-items: center; justify-content: space-around;
             background: rgba(0, 102, 102, 0.05); padding: 8px; border-radius: 50px; 
@@ -134,16 +111,12 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 5px 15px rgba(0, 102, 102, 0.3);
         }
-        
         .count { font-size: 1.6rem; font-weight: 900; color: var(--primary); min-width: 35px; }
-
         .chart-wrapper { background: var(--card-bg); padding: 35px; border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; height: 450px; }
-        
         .footer-export {
             text-align: center; padding: 45px; background: var(--card-bg); 
             border-radius: 35px; box-shadow: var(--shadow-soft);
         }
-        
         #adminPanel {
             position: fixed; right: -400px; top: 0; width: 340px; height: 100%;
             background: var(--card-bg); box-shadow: -20px 0 50px rgba(0,0,0,0.15);
@@ -152,7 +125,6 @@
         #adminPanel.active { right: 0; }
         .locked { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
         .locked-tag { color: #ff4757; font-size: 0.7rem; font-weight: 800; display: block; margin-top: 6px; }
-
         @media (max-width: 1300px) { .executives { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 768px) {
             .rak-left { position: relative; text-align: center; width: 100%; margin-bottom: 5px; }
@@ -163,21 +135,17 @@
         }
     </style>
 </head>
-
 <body>
 
 <div class="container">
     <header>
         <div class="rak-left">RAK</div>
-        
         <div class="top-controls">
             <button class="btn-tool" onclick="toggleFullScreen()" title="Fullscreen">⛶</button>
             <button class="btn-tool" onclick="toggleDark()" title="Theme">🌓</button>
             <button class="btn-tool" onclick="openAdmin()" title="Settings">⚙️</button>
         </div>
-
         <h2 class="showroom-title">Fujairah Showroom</h2>
-        
         <div id="datetime">
             <h1 id="time">00:00:00</h1>
             <div id="date-info"><span id="day"></span>, <span id="date"></span></div>
@@ -226,9 +194,7 @@
 </div>
 
 <script>
-/* Note: Replace 'AIzaSy...' with your actual Firebase API Key 
-   to enable database syncing.
-*/
+// IMPORTANT: Paste your real API Key here if it is not already there
 const firebaseConfig = {
     apiKey: "AIzaSy...", 
     authDomain: "walkins-1075c.firebaseapp.com",
@@ -244,7 +210,11 @@ let lockedUsers = {};
 let walkinChart;
 let historyData = [];
 
-// Initialize Grids
+// UPDATED SHOWROOM COORDINATES (Opposite Grand Sheikh Zayed Mosque)
+const showroomLat = 25.132047; 
+const showroomLon = 56.321035; 
+const allowedRadiusKM = 0.5; // 500 Meters
+
 executives.forEach(name => {
     const div = document.createElement("div");
     div.className = "card"; div.id = `card-${name}`;
@@ -264,6 +234,39 @@ function updateDateTime(){
     document.getElementById('time').innerText = now.toLocaleTimeString([], { hour12: false });
 }
 setInterval(updateDateTime, 1000);
+
+// GEOPOLITICAL RESTRICTION LOGIC
+function update(name, val) { 
+    if(lockedUsers[name]) return;
+
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            const distance = calculateDistance(userLat, userLon, showroomLat, showroomLon);
+
+            if (distance <= allowedRadiusKM) {
+                db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
+            } else {
+                alert(`ACCESS DENIED: You are currently ${distance.toFixed(2)}km away. Updates are only allowed at the Fujairah Showroom.`);
+            }
+        }, (error) => {
+            alert("LOCATION REQUIRED: Please enable GPS/Location access to update counts.");
+        }, { enableHighAccuracy: true });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth radius in KM
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
 
 function calculatePeakHour(data) {
     const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
@@ -372,10 +375,6 @@ db.ref("locks").on("value", snap => {
     });
 });
 
-function update(name, val) { 
-    if(!lockedUsers[name]) db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
-}
-
 function toggleDark(){ document.body.classList.toggle("dark"); setTimeout(renderChart, 100); }
 function toggleFullScreen() {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
@@ -403,20 +402,13 @@ function exportData(){
     historyData.forEach(d => {
         const dt = new Date(d.timestamp);
         const dStr = dt.toISOString().split("T")[0];
-        
-        // UPDATE THIS LINE BELOW:
         const tStr = dt.toLocaleTimeString('en-GB', { hour12: false });
-        
         if(dStr >= start && dStr <= end) rows.push([d.executive, d.count, dStr, tStr]);
     });
     const ws = XLSX.utils.aoa_to_sheet(rows), wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Showroom_Report.xlsx");
 }
 </script>
-
-<footer style="text-align:center;margin-top:50px;padding-top:15px;border-top:1px solid #ddd;color:#888;font-size:13px;">
-  © 2026 Hesper. All rights reserved.
-</footer>
-
+<footer style="text-align:center;margin-top:50px;padding-top:15px;border-top:1px solid #ddd;color:#888;font-size:13px;">  © 2026 Hesper. All rights reserved.</footer>
 </body>
 </html>
