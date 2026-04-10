@@ -33,16 +33,20 @@
             font-family: 'Inter', -apple-system, sans-serif; 
             background: var(--bg); 
             color: var(--text-main);
-            margin: 0; padding: 20px; 
+            margin: 0; padding: 15px; 
             transition: background 0.3s, color 0.3s;
             overflow-x: hidden;
         }
         .container { max-width: 1400px; margin: 0 auto; }
+        
         header { 
             text-align: center; 
             margin-bottom: 20px; 
             position: relative; 
             padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .rak-left {
             position: absolute;
@@ -56,33 +60,39 @@
         .showroom-title { 
             font-size: 2.4rem; 
             font-weight: 800; 
-            margin: 0 0 25px 0;
+            margin: 10px 0 25px 0;
             color: var(--fujairah-color); 
             letter-spacing: -1.5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
             transition: color 0.3s ease;
         }
         .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 10px; }
+        
         .btn-tool {
             width: 36px; height: 36px; border-radius: 12px; border: none;
             background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
             box-shadow: var(--shadow-soft); transition: var(--transition);
             color: var(--primary); font-size: 1.1rem;
         }
-        #datetime { text-align: center; margin-bottom: 20px; }
+
+        #datetime { text-align: center; margin-bottom: 20px; width: 100%; }
         #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -1px; }
         #date-info { font-size: 1.2rem; opacity: 0.8; font-weight: 500; }
-        .peak-container { display: flex; justify-content: center; margin-bottom: 20px; }
+
+        .peak-container { display: flex; justify-content: center; margin-bottom: 15px; width: 100%; }
         .peak-card {
             background: var(--card-bg);
-            padding: 15px 40px;
+            padding: 15px 25px;
             border-radius: 20px;
             box-shadow: var(--shadow-soft);
             border-left: 5px solid var(--accent);
             text-align: center;
+            width: 100%;
+            max-width: 300px;
         }
         .peak-card h4 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; letter-spacing: 1px; }
-        .peak-card div { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+        .peak-card div { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { 
             background: var(--card-bg); padding: 25px; border-radius: 28px; text-align: center; 
@@ -90,8 +100,10 @@
         }
         .stat-card h3 { margin: 0 0 5px 0; font-size: 0.9rem; text-transform: uppercase; opacity: 0.6; font-weight: 600; }
         .stat-card span { font-size: 2.5rem; font-weight: 900; color: var(--primary); }
+
         .executives { 
-            display: grid; grid-template-columns: repeat(7, 1fr); 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
             gap: 15px; margin-bottom: 40px; width: 100%;
         }
         .card {
@@ -112,26 +124,44 @@
             box-shadow: 0 5px 15px rgba(0, 102, 102, 0.3);
         }
         .count { font-size: 1.6rem; font-weight: 900; color: var(--primary); min-width: 35px; }
-        .chart-wrapper { background: var(--card-bg); padding: 35px; border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; height: 450px; }
+        
+        .chart-wrapper { background: var(--card-bg); padding: 25px; border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; height: 450px; }
+        
         .footer-export {
-            text-align: center; padding: 45px; background: var(--card-bg); 
+            text-align: center; padding: 45px 20px; background: var(--card-bg); 
             border-radius: 35px; box-shadow: var(--shadow-soft);
         }
         #adminPanel {
-            position: fixed; right: -400px; top: 0; width: 340px; height: 100%;
+            position: fixed; right: -400px; top: 0; width: 85%; max-width: 340px; height: 100%;
             background: var(--card-bg); box-shadow: -20px 0 50px rgba(0,0,0,0.15);
             transition: 0.5s ease; z-index: 1000; padding: 40px;
         }
         #adminPanel.active { right: 0; }
         .locked { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
         .locked-tag { color: #ff4757; font-size: 0.7rem; font-weight: 800; display: block; margin-top: 6px; }
-        @media (max-width: 1300px) { .executives { grid-template-columns: repeat(4, 1fr); } }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 1024px) {
+            .executives { grid-template-columns: repeat(3, 1fr); }
+        }
+
         @media (max-width: 768px) {
-            .rak-left { position: relative; text-align: center; width: 100%; margin-bottom: 5px; }
-            .top-controls { top: 60px; right: 10px; }
-            .totals { grid-template-columns: 1fr; max-width: 100%; }
-            .executives { grid-template-columns: 1fr 1fr; }
-            #time { font-size: 4rem; }
+            header { padding-top: 60px; }
+            .rak-left { width: 100%; text-align: center; top: 0; position: absolute; }
+            .top-controls { top: 10px; right: 10px; }
+            .showroom-title { font-size: 1.8rem; }
+            #time { font-size: 2.8rem; }
+            .totals { grid-template-columns: 1fr; }
+            .executives { grid-template-columns: repeat(2, 1fr); }
+            .footer-export button { width: 100%; margin-left: 0 !important; margin-top: 20px; }
+            .footer-export input { width: 100%; margin-bottom: 10px; padding: 12px; box-sizing: border-box; }
+            .chart-wrapper { height: 350px; padding: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            .executives { grid-template-columns: 1fr; }
+            .showroom-title { font-size: 1.5rem; }
+            .stat-card span { font-size: 2rem; }
         }
     </style>
 </head>
@@ -170,7 +200,7 @@
     <div class="chart-wrapper">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h3 style="margin:0; font-weight: 900; font-size: 1.4rem;">Footfall Analysis</h3>
-            <select id="viewSelector" onchange="renderChart()" style="padding: 12px 20px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); font-weight: 600; cursor: pointer; outline: none; background: var(--card-bg); color: var(--text-main);">
+            <select id="viewSelector" onchange="renderChart()" style="padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); background: var(--card-bg); color: var(--text-main);">
                 <option value="line">Monthly Activity</option>
                 <option value="bar">Day Analysis</option>
             </select>
@@ -180,10 +210,10 @@
 
     <div class="footer-export">
         <div style="margin-bottom: 20px; opacity: 0.5; font-weight: 700; text-transform: uppercase; font-size: 0.8rem;">Data Management</div>
-        <input type="date" id="startDate" style="padding:14px; border-radius: 12px; border: 1px solid #ddd; background: var(--card-bg); color: var(--text-main);"> 
-        <span style="font-weight: 900; color: var(--primary); margin: 0 15px;">TO</span>
-        <input type="date" id="endDate" style="padding:14px; border-radius: 12px; border: 1px solid #ddd; background: var(--card-bg); color: var(--text-main);">
-        <button onclick="exportData()" style="margin-left: 25px; padding: 15px 40px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer;">EXPORT EXCEL</button>
+        <input type="date" id="startDate" style="border-radius: 12px; border: 1px solid #ddd; background: var(--card-bg); color: var(--text-main);"> 
+        <span style="font-weight: 900; color: var(--primary); margin: 0 10px;">TO</span>
+        <input type="date" id="endDate" style="border-radius: 12px; border: 1px solid #ddd; background: var(--card-bg); color: var(--text-main);">
+        <button onclick="exportData()" style="margin-left: 20px; padding: 15px 30px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer;">EXPORT EXCEL</button>
     </div>
 </div>
 
@@ -194,7 +224,6 @@
 </div>
 
 <script>
-// IMPORTANT: Paste your real API Key here if it is not already there
 const firebaseConfig = {
     apiKey: "AIzaSy...", 
     authDomain: "walkins-1075c.firebaseapp.com",
@@ -210,10 +239,9 @@ let lockedUsers = {};
 let walkinChart;
 let historyData = [];
 
-// UPDATED SHOWROOM COORDINATES (Opposite Grand Sheikh Zayed Mosque)
 const showroomLat = 25.132047; 
 const showroomLon = 56.321035; 
-const allowedRadiusKM = 0.5; // 500 Meters
+const allowedRadiusKM = 0.5;
 
 executives.forEach(name => {
     const div = document.createElement("div");
@@ -235,37 +263,32 @@ function updateDateTime(){
 }
 setInterval(updateDateTime, 1000);
 
-// GEOPOLITICAL RESTRICTION LOGIC
 function update(name, val) { 
     if(lockedUsers[name]) return;
-
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition((position) => {
             const userLat = position.coords.latitude;
             const userLon = position.coords.longitude;
             const distance = calculateDistance(userLat, userLon, showroomLat, showroomLon);
-
             if (distance <= allowedRadiusKM) {
                 db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
             } else {
-                alert(`ACCESS DENIED: You are currently ${distance.toFixed(2)}km away. Updates are only allowed at the Fujairah Showroom.`);
+                alert(`ACCESS DENIED: Distance: ${distance.toFixed(2)}km. Must be at Fujairah Showroom.`);
             }
         }, (error) => {
-            alert("LOCATION REQUIRED: Please enable GPS/Location access to update counts.");
+            alert("LOCATION REQUIRED to update counts.");
         }, { enableHighAccuracy: true });
     } else {
-        alert("Geolocation is not supported by this browser.");
+        alert("Geolocation not supported.");
     }
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth radius in KM
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function calculatePeakHour(data) {
@@ -273,16 +296,12 @@ function calculatePeakHour(data) {
     const hourCounts = Array(24).fill(0);
     data.forEach(entry => {
         if (entry.timestamp > thirtyDaysAgo && entry.count > 0) {
-            const hour = new Date(entry.timestamp).getHours();
-            hourCounts[hour] += entry.count;
+            hourCounts[new Date(entry.timestamp).getHours()] += entry.count;
         }
     });
     let maxHour = 0, maxVal = 0;
-    hourCounts.forEach((count, hr) => {
-        if (count > maxVal) { maxVal = count; maxHour = hr; }
-    });
-    if (maxVal === 0) return "No Data";
-    return `${maxHour.toString().padStart(2, '0')}:00 - ${(maxHour + 1).toString().padStart(2, '0')}:00`;
+    hourCounts.forEach((count, hr) => { if (count > maxVal) { maxVal = count; maxHour = hr; } });
+    return maxVal === 0 ? "No Data" : `${maxHour}:00 - ${maxHour + 1}:00`;
 }
 
 db.ref("walkins").on("value", snap => {
@@ -291,8 +310,7 @@ db.ref("walkins").on("value", snap => {
     const monthlyCounts = {};
     executives.forEach(e => monthlyCounts[e] = 0);
     const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
+    const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
 
     snap.forEach(child => {
         const val = child.val();
@@ -325,8 +343,7 @@ function renderChart() {
     let labels = [], data = [];
 
     if(type === 'line') {
-        const days = now.getDate();
-        labels = Array.from({length: days}, (_, i) => i + 1);
+        labels = Array.from({length: now.getDate()}, (_, i) => i + 1);
         const dailyMap = {};
         historyData.forEach(h => {
             const dt = new Date(h.timestamp);
@@ -348,7 +365,7 @@ function renderChart() {
             datasets: [{ 
                 label: 'Visitors', data: data, 
                 borderColor: primary, backgroundColor: type === 'line' ? 'rgba(0,168,168,0.1)' : primary,
-                fill: true, tension: 0.4, borderRadius: 15
+                fill: true, tension: 0.4, borderRadius: 10
             }]
         },
         options: { 
@@ -389,8 +406,7 @@ function renderAdmin() {
         const locked = lockedUsers[name] || false;
         list.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:12px; background:rgba(0,0,0,0.05); padding:12px; border-radius:15px; align-items:center;">
             <span style="font-weight:700;">${name}</span>
-            <button onclick="toggleLock('${name}')" style="background:${locked?'#ff4757':'#006666'}; color:white; border:none; padding:8px 20px; border-radius:10px; cursor:pointer; font-weight:700;">
-            ${locked?'LOCKED':'ACTIVE'}</button></div>`;
+            <button onclick="toggleLock('${name}')" style="background:${locked?'#ff4757':'#006666'}; color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer;">${locked?'LOCKED':'ACTIVE'}</button></div>`;
     });
 }
 function toggleLock(name) { db.ref("locks/"+name).set(!lockedUsers[name]).then(renderAdmin); }
@@ -402,13 +418,14 @@ function exportData(){
     historyData.forEach(d => {
         const dt = new Date(d.timestamp);
         const dStr = dt.toISOString().split("T")[0];
-        const tStr = dt.toLocaleTimeString('en-GB', { hour12: false });
-        if(dStr >= start && dStr <= end) rows.push([d.executive, d.count, dStr, tStr]);
+        if(dStr >= start && dStr <= end) rows.push([d.executive, d.count, dStr, dt.toLocaleTimeString('en-GB')]);
     });
     const ws = XLSX.utils.aoa_to_sheet(rows), wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, "Showroom_Report.xlsx");
 }
 </script>
-<footer style="text-align:center;margin-top:50px;padding-top:15px;border-top:1px solid #ddd;color:#888;font-size:13px;">  © 2026 Hesper. All rights reserved.</footer>
+<footer style="text-align:center;margin-top:50px;padding:20px 0;border-top:1px solid #ddd;color:#888;font-size:13px;">  
+  © 2026 Hesper. All rights reserved.
+</footer>
 </body>
 </html>
