@@ -66,7 +66,7 @@
             letter-spacing: -1.5px;
         }
         
-        /* --- BULLETIN STYLING (SLOWER & SMARTER) --- */
+        /* --- FIXED BULLETIN STYLING --- */
         .bulletin-board {
             width: 100%;
             background: var(--primary);
@@ -102,18 +102,19 @@
             font-weight: 500;
             font-size: 1.05rem;
             white-space: nowrap;
-            padding-left: 10%; 
-            animation: ticker 60s linear infinite; /* Slow, readable 60s crawl */
+            padding-left: 25px; 
+            /* Start from the right of the container for readability */
+            animation: ticker 40s linear infinite; 
         }
         .bulletin-board:hover #smart-insight {
             animation-play-state: paused;
         }
         @keyframes ticker {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(100%); } /* Starts from right side for clear readability */
+            100% { transform: translateX(-100%); } 
         }
 
-        /* --- OTHER UI COMPONENTS --- */
+        /* --- UI COMPONENTS --- */
         .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 10px; }
         .btn-tool {
             width: 36px; height: 36px; border-radius: 12px; border: none;
@@ -125,7 +126,7 @@
         .peak-card {
             background: var(--card-bg); padding: 15px 25px; border-radius: 20px;
             box-shadow: var(--shadow-soft); border-left: 5px solid var(--primary);
-            border-right: 5px solid var(--primary); text-align: center; width: 100%; max-width: 300px; margin: 0 auto 15px;
+            border-right: 5px solid var(--primary); text-align: center; width: 100%; max-width: 320px; margin: 0 auto 15px;
         }
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { 
@@ -148,13 +149,6 @@
         .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
         .locked-tag { color: #ff4757; font-size: 0.7rem; font-weight: 800; display: block; }
         .footer-export { text-align: center; padding: 45px 20px; background: var(--card-bg); border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; }
-
-        @media (max-width: 768px) {
-            header { padding-top: 60px; }
-            .rak-left { width: 100%; text-align: center; top: 0; }
-            .totals { grid-template-columns: 1fr; }
-            .executives { grid-template-columns: repeat(2, 1fr); }
-        }
     </style>
 </head>
 <body>
@@ -170,9 +164,9 @@
         <h2 class="showroom-title">Fujairah Showroom</h2>
         
         <div class="bulletin-board">
-            <div class="bulletin-label">Live Bulletin</div>
+            <div class="bulletin-label">Live Feed</div>
             <div class="ticker-wrap">
-                <div id="smart-insight">Connecting to live feed...</div>
+                <div id="smart-insight">Syncing performance records...</div>
             </div>
         </div>
 
@@ -183,7 +177,7 @@
     </header>
 
     <div class="peak-card">
-        <h4 style="margin:0; font-size:0.8rem; opacity:0.6; text-transform:uppercase;">Peak Hour (30D)</h4>
+        <h4 style="margin:0; font-size:0.8rem; opacity:0.6; text-transform:uppercase;">Peak Activity (30D)</h4>
         <div id="peak-hour-val" style="font-size:1.6rem; font-weight:800; color:var(--primary);">...</div>
     </div>
 
@@ -311,61 +305,47 @@ function syncWalkins() {
     });
 }
 
-// --- HUMOROUS INSIGHTS ENGINE ---
 function updateInsights(monthlyCounts, dailyTotal) {
     const insightEl = document.getElementById("smart-insight");
     let messages = [];
 
-    // 1. Humor Mojo
+    const teamJokes = [
+        `Nasar is checking the CCTV... Stop dancing and start selling! 😂`,
+        `Nasar's Rule #1: If a customer smiles, they're buying. Rule #2: See Rule #1. 📋`,
+        `Nasar said whoever sells the most today gets to choose the showroom music! 🎵`,
+        `Rumor has it Nasar can walk through tiles without touching the grout. 🧱`,
+        `Fujairah Team: Where we sell tiles and drink way too much tea! ☕`,
+        `Nasar's secret to success? 99% hard work and 1% making sure the dashboard is green! 📈`
+    ];
+
     if (executives.length > 0) {
         const randomName = executives[Math.floor(Math.random() * executives.length)];
-        const jokes = [
-            `Is it the coffee, or is ${randomName} just naturally this fast? ☕`,
-            `${randomName} is in the zone. Legend says they can see walk-ins before they park! 🏎️`,
-            `Rumor has it ${randomName} once closed a deal while drinking tea. Talent. 🍵`,
-            `Warning: ${randomName}'s high energy levels may be contagious! ⚡`,
-            `Is that a showroom or a runway? ${randomName} is making it look easy! 👠`
+        const staffJokes = [
+            `${randomName} just drank a double espresso. Watch out, walk-ins! ⚡`,
+            `Is that ${randomName} or a whirlwind? Nasar is impressed! 🏎️`,
+            `Warning: ${randomName}'s charm is currently at 110% capacity. 🔥`,
+            `${randomName} is making sales look so easy, even the tiles are impressed! 👠`
         ];
-        messages.push(`🔥 MOJO: ${jokes[Math.floor(Math.random() * jokes.length)]}`);
+        
+        const allJokes = [...teamJokes, ...staffJokes];
+        messages.push(`🔥 MOJO: ${allJokes[Math.floor(Math.random() * allJokes.length)]}`);
     }
 
-    // 2. Priority
     let activeExecs = executives.filter(name => !lockedUsers[name]);
     if(activeExecs.length > 0) {
         let sorted = activeExecs.sort((a, b) => (monthlyCounts[a] || 0) - (monthlyCounts[b] || 0));
-        messages.push(`🎯 NEXT UP: ${sorted[0]}, you're first in line!`);
+        messages.push(`🎯 NEXT UP: ${sorted[0]}, you're in the spotlight!`);
     }
 
-    // 3. Team Motivation
-    if(dailyTotal > 5) messages.push(`🚀 POWER TEAM: ${dailyTotal} guests welcomed today. Keep crushing it!`);
+    if(dailyTotal > 0) messages.push(`🚀 POWER TEAM: ${dailyTotal} customers served today. Keep pushing!`);
     
-    // 4. Analytics
     const peak = calculatePeakHour(historyData);
-    if(peak !== "No Data") messages.push(`⏰ TRAFFIC: Our "Power Hour" usually hits at ${peak}.`);
+    if(peak !== "No Data") messages.push(`⏰ TRAFFIC: The "Golden Hour" usually hits at ${peak}.`);
 
-    // 5. Leader
-    let topExec = Object.keys(monthlyCounts).reduce((a, b) => monthlyCounts[a] > monthlyCounts[b] ? a : b, "");
-    if(topExec) messages.push(`👑 TOP GUN: ${topExec} is setting the pace this month.`);
+    let topExec = Object.keys(monthlyCounts).reduce((a, b) => (monthlyCounts[a] || 0) > (monthlyCounts[b] || 0) ? a : b, "");
+    if(topExec) messages.push(`👑 TOP GUN: ${topExec} is ruling the leaderboard this month.`);
 
-    insightEl.innerText = messages.join("       |       ") + "       |       ⚡ TEAM FUJAIRAH: WORK HARD, LAUGH LOUDER!       |       ";
-}
-
-// --- LOGIC FUNCTIONS ---
-function update(name, val) { 
-    if(lockedUsers[name]) return;
-    navigator.geolocation.getCurrentPosition(pos => {
-        const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, showroomLat, showroomLon);
-        if (dist <= allowedRadiusKM) {
-            db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
-        } else alert(`Location Error: Must be at showroom. You are ${dist.toFixed(1)}km away.`);
-    }, (err) => alert("Location required to update."), { enableHighAccuracy: true });
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    insightEl.innerText = messages.join("        |        ") + "        |        ⚡ TEAM FUJAIRAH: SELL HARD, LAUGH LOUDER!        |        ";
 }
 
 function calculatePeakHour(data) {
@@ -374,7 +354,25 @@ function calculatePeakHour(data) {
     data.forEach(e => { if(e.timestamp > thirtyDaysAgo && e.count > 0) hourCounts[new Date(e.timestamp).getHours()] += e.count; });
     let maxHr = 0, maxV = 0;
     hourCounts.forEach((v, h) => { if(v > maxV) { maxV = v; maxHr = h; } });
-    return maxV === 0 ? "No Data" : `${maxHr}:00`;
+    if (maxV === 0) return "No Data";
+    return `${maxHr < 10 ? '0'+maxHr : maxHr}:00 - ${maxHr+1 < 10 ? '0'+(maxHr+1) : maxHr+1}:00`;
+}
+
+function update(name, val) { 
+    if(lockedUsers[name]) return;
+    navigator.geolocation.getCurrentPosition(pos => {
+        const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, showroomLat, showroomLon);
+        if (dist <= allowedRadiusKM) {
+            db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
+        } else alert(`Location Error: You are ${dist.toFixed(1)}km away.`);
+    }, (err) => alert("Location required."), { enableHighAccuracy: true });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function renderChart() {
