@@ -66,7 +66,6 @@
             letter-spacing: -1.5px;
         }
         
-        /* --- FIXED BULLETIN STYLING --- */
         .bulletin-board {
             width: 100%;
             background: var(--primary);
@@ -102,19 +101,17 @@
             font-weight: 500;
             font-size: 1.05rem;
             white-space: nowrap;
-            padding-left: 25px; 
-            /* Start from the right of the container for readability */
-            animation: ticker 40s linear infinite; 
+            padding-left: 100%; 
+            animation: ticker 35s linear infinite; 
         }
         .bulletin-board:hover #smart-insight {
             animation-play-state: paused;
         }
         @keyframes ticker {
-            0% { transform: translateX(10%); } /* Starts from right side for clear readability */
+            0% { transform: translateX(0%); } 
             100% { transform: translateX(-100%); } 
         }
 
-        /* --- UI COMPONENTS --- */
         .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 10px; }
         .btn-tool {
             width: 36px; height: 36px; border-radius: 12px; border: none;
@@ -130,7 +127,7 @@
         }
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { 
-            background: var(--card-bg); padding: 25px; border-radius: 28px; text-align: center; 
+            background: var(--card-bg); padding: 25px; border-radius: 30px; text-align: center; 
             box-shadow: var(--shadow-soft); border-bottom: 6px solid var(--primary); border-top: 6px solid var(--primary);
         }
         .stat-card span { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
@@ -309,41 +306,47 @@ function updateInsights(monthlyCounts, dailyTotal) {
     const insightEl = document.getElementById("smart-insight");
     let messages = [];
 
-    const teamJokes = [
-        `Nasar is checking the CCTV... Stop dancing and start selling! 😂`,
-        `Nasar's Rule #1: If a customer smiles, they're buying. Rule #2: See Rule #1. 📋`,
-        `Nasar said whoever sells the most today gets to choose the showroom music! 🎵`,
-        `Rumor has it Nasar can walk through tiles without touching the grout. 🧱`,
-        `Fujairah Team: Where we sell tiles and drink way too much tea! ☕`,
-        `Nasar's secret to success? 99% hard work and 1% making sure the dashboard is green! 📈`
+    // 1. NASAR SEGMENT
+    const nasarJokes = [
+        `NASAR'S CCTV WATCH: Stop dancing in Aisle 4 and start selling! 😂`,
+        `NASAR'S RULE: If a customer smiles, they've basically bought a bathroom set. 📋`,
+        `NASAR: "The dashboard is green, but my tea is cold. More sales please!" ☕`,
+        `NASAR'S SECRET: He doesn't sleep, he just waits for the next container. 🧱`,
+        `NASAR: "I can smell a big sale from the parking lot. Get ready!" 👃💰`
+    ];
+    messages.push(`👔 BOSS MOVE: ${nasarJokes[Math.floor(Math.random() * nasarJokes.length)]}`);
+
+    // 2. THE SPOTLIGHT
+    let activeExecs = executives.filter(name => !lockedUsers[name]);
+    if (activeExecs.length > 0) {
+        let sorted = [...activeExecs].sort((a, b) => (monthlyCounts[a] || 0) - (monthlyCounts[b] || 0));
+        messages.push(`🎯 SPOTLIGHT: ${sorted[0]}, you're up! Time to close a deal.`);
+    }
+
+    // 3. TWO RANDOM EXECUTIVES
+    const teamMojo = [
+        "is out-charming the showroom lights. 💡",
+        "just drank a double espresso. Run, walk-ins! ⚡",
+        "is making the tiles look good just by standing near them. 👠",
+        "is in 'The Zone'. Do not disturb unless buying 1000sqm! 📈",
+        "is officially the Tile Whisperer of Fujairah. 🧘‍♂️",
+        "is on a winning streak! 🔥",
+        "just practiced their 'Welcome' smile for 20 minutes. ✨"
     ];
 
     if (executives.length > 0) {
-        const randomName = executives[Math.floor(Math.random() * executives.length)];
-        const staffJokes = [
-            `${randomName} just drank a double espresso. Watch out, walk-ins! ⚡`,
-            `Is that ${randomName} or a whirlwind? Nasar is impressed! 🏎️`,
-            `Warning: ${randomName}'s charm is currently at 110% capacity. 🔥`,
-            `${randomName} is making sales look so easy, even the tiles are impressed! 👠`
-        ];
-        
-        const allJokes = [...teamJokes, ...staffJokes];
-        messages.push(`🔥 MOJO: ${allJokes[Math.floor(Math.random() * allJokes.length)]}`);
+        let shuffled = [...executives].sort(() => 0.5 - Math.random());
+        let selected = shuffled.slice(0, 2); 
+        selected.forEach(name => {
+            const joke = teamMojo[Math.floor(Math.random() * teamMojo.length)];
+            messages.push(`😎 ${name.toUpperCase()} ${joke}`);
+        });
     }
 
-    let activeExecs = executives.filter(name => !lockedUsers[name]);
-    if(activeExecs.length > 0) {
-        let sorted = activeExecs.sort((a, b) => (monthlyCounts[a] || 0) - (monthlyCounts[b] || 0));
-        messages.push(`🎯 NEXT UP: ${sorted[0]}, you're in the spotlight!`);
-    }
-
-    if(dailyTotal > 0) messages.push(`🚀 POWER TEAM: ${dailyTotal} customers served today. Keep pushing!`);
-    
-    const peak = calculatePeakHour(historyData);
-    if(peak !== "No Data") messages.push(`⏰ TRAFFIC: The "Golden Hour" usually hits at ${peak}.`);
-
+    // 4. STATS & LEADER
+    if (dailyTotal > 0) messages.push(`🚀 POWER TEAM: ${dailyTotal} customers served today.`);
     let topExec = Object.keys(monthlyCounts).reduce((a, b) => (monthlyCounts[a] || 0) > (monthlyCounts[b] || 0) ? a : b, "");
-    if(topExec) messages.push(`👑 TOP GUN: ${topExec} is ruling the leaderboard this month.`);
+    if (topExec) messages.push(`👑 TOP GUN: ${topExec} is ruling the leaderboard!`);
 
     insightEl.innerText = messages.join("        |        ") + "        |        ⚡ TEAM FUJAIRAH: SELL HARD, LAUGH LOUDER!        |        ";
 }
