@@ -308,10 +308,10 @@ function updateInsights(monthlyCounts, dailyTotal) {
 
     // 1. NASAR SEGMENT
     const nasarJokes = [
-        `NASAR'S CCTV WATCH: Stop dancing in Aisle 4 and start selling! 😂`,
+        `NASAR'S CCTV WATCH: Stop dancing infront of the mirror and start selling! 😂`,
         `NASAR'S RULE: If a customer smiles, they've basically bought a bathroom set. 📋`,
         `NASAR: "The dashboard is green, but my tea is cold. More sales please!" ☕`,
-        `NASAR'S SECRET: He doesn't sleep, he just waits for the next container. 🧱`,
+        `NASAR'S SECRET: He doesn't sleep, he just waits for the next Order. 🧱`,
         `NASAR: "I can smell a big sale from the parking lot. Get ready!" 👃💰`
     ];
     messages.push(`👔 BOSS MOVE: ${nasarJokes[Math.floor(Math.random() * nasarJokes.length)]}`);
@@ -328,10 +328,35 @@ function updateInsights(monthlyCounts, dailyTotal) {
         "is out-charming the showroom lights. 💡",
         "just drank a double espresso. Run, walk-ins! ⚡",
         "is making the tiles look good just by standing near them. 👠",
+	"is turning browsers into buyers like magic. 🎩",
+	"is casually closing deals in their head already. 🧠",
+	"is making grout sound exciting somehow. 🤯",
+	"is one 'Hello' away from a confirmed sale. 😎",
+	"is scanning the door like a hawk. 👀",
+	"is about to upsell without breaking a sweat. 💼",
+	"is warming up for the next big deal. 🔥",
+	"is making premium look easy. ✨",
+	"is already planning the customer's dream space. 🏡",
+	"is in full showroom domination mode. 🚀",
+	"is reading customers like an open book. 📖",
+	"is silently judging tile choices… professionally. 😏",
+	"is about to say 'We have exactly what you need'. 🎯",
+	"is converting doubts into decisions. 💬",
+	"is running on confidence and good vibes. ⚡",
+	"is making every step count on the showroom floor. 👣",
+	"is one deal away from legend status. 🏆",
+	"is bringing luxury to life, one tile at a time. 💎",
+	"is making competitors nervous without trying. 😌",
+	"is fully booked… mentally. 📅",
+	"is making walk-ins feel like VIPs. 👑",
+	"is turning questions into quotations instantly. 🧾",
+	"is ready for the next challenge. Bring it on! 💪",
+	"is making the showroom look even better today. 🌟",
         "is in 'The Zone'. Do not disturb unless buying 1000sqm! 📈",
         "is officially the Tile Whisperer of Fujairah. 🧘‍♂️",
         "is on a winning streak! 🔥",
-        "just practiced their 'Welcome' smile for 20 minutes. ✨"
+	"is operating at 110% efficiency. 📊",
+      
     ];
 
     if (executives.length > 0) {
@@ -451,4 +476,8 @@ function exportData(){
     XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, `Fujairah_Report_${s}_to_${e}.xlsx`);
 }
 </script>
-<footer style="text-align:center; padding:20px; color:#888; font-size:13px; backgroun
+<footer style="text-align:center; padding:20px; color:#888; font-size:13px; background: var(--card-bg); border-radius: 0 0 35px 35px;">  
+  © 2026 Hesper. All rights reserved.
+</footer>
+</body>
+</html>
