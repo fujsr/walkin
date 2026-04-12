@@ -251,7 +251,7 @@ let lockedUsers = {};
 let walkinChart;
 let historyData = [];
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const showroomLat = 25.1286086, showroomLon = 56.3247819, allowedRadiusKM = 2;
+const showroomLat = 25.125991, showroomLon = 56.326791, allowedRadiusKM = 2;
 
 db.ref("executiveList").on("value", snap => {
     executives = Object.values(snap.val() || {}).sort();
