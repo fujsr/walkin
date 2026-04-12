@@ -49,19 +49,21 @@
             flex-direction: column;
             align-items: center;
         }
+
         .rak-left {
             position: absolute;
-            left: 0;
-            top: 10px;
+            left: 0; top: 10px;
             font-size: 2.4rem;
             font-weight: 800;
             color: var(--rak-text);
             letter-spacing: -1.5px;
         }
+        .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 8px; }
+
         .showroom-title { 
             font-size: 2.4rem; 
             font-weight: 800;
-            margin: 10px 0 10px 0;
+            margin: 10px 0;
             color: var(--fujairah-color); 
             letter-spacing: -1.5px;
         }
@@ -70,82 +72,100 @@
             width: 100%;
             background: var(--primary);
             color: white;
-            padding: 12px;
+            padding: 10px;
             border-radius: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             overflow: hidden;
             box-shadow: var(--shadow-soft);
-            position: relative;
+            box-sizing: border-box;
         }
         .bulletin-label {
             background: #004d4d;
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 8px;
             font-weight: 800;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             z-index: 10;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
             white-space: nowrap;
         }
-        .ticker-wrap {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-        }
+        .ticker-wrap { flex: 1; overflow: hidden; display: flex; align-items: center; }
         #smart-insight {
             display: inline-block;
             font-weight: 500;
-            font-size: 1.05rem;
+            font-size: 1rem;
             white-space: nowrap;
             padding-left: 100%; 
             animation: ticker 35s linear infinite; 
         }
-        .bulletin-board:hover #smart-insight {
-            animation-play-state: paused;
-        }
-        @keyframes ticker {
-            0% { transform: translateX(0%); } 
-            100% { transform: translateX(-100%); } 
+        @keyframes ticker { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+        .btn-tool {
+            width: 40px; height: 40px; border-radius: 12px; border: none;
+            background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-soft); color: var(--primary); font-size: 1.2rem;
         }
 
-        .top-controls { position: absolute; right: 0; top: 10px; display: flex; gap: 10px; }
-        .btn-tool {
-            width: 36px; height: 36px; border-radius: 12px; border: none;
-            background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--shadow-soft); color: var(--primary); font-size: 1.1rem;
-        }
-        #time { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -1px; }
-        #date-info { font-size: 1.2rem; opacity: 0.8; font-weight: 500; margin-bottom: 15px; }
+        #time { font-size: clamp(2.5rem, 8vw, 3.5rem); font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -1px; }
+        #date-info { font-size: 1.1rem; opacity: 0.8; font-weight: 500; margin-bottom: 15px; }
+
         .peak-card {
-            background: var(--card-bg); padding: 15px 25px; border-radius: 20px;
+            background: var(--card-bg); padding: 15px; border-radius: 20px;
             box-shadow: var(--shadow-soft); border-left: 5px solid var(--primary);
-            border-right: 5px solid var(--primary); text-align: center; width: 100%; max-width: 320px; margin: 0 auto 15px;
+            border-right: 5px solid var(--primary); text-align: center; width: 100%; max-width: 320px; margin: 0 auto 20px;
+            box-sizing: border-box;
         }
+
         .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { 
-            background: var(--card-bg); padding: 25px; border-radius: 30px; text-align: center; 
+            background: var(--card-bg); padding: 20px 10px; border-radius: 25px; text-align: center; 
             box-shadow: var(--shadow-soft); border-bottom: 6px solid var(--primary); border-top: 6px solid var(--primary);
         }
-        .stat-card span { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
-        .executives { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 40px; }
+        .stat-card h3 { font-size: 0.9rem; margin: 0 0 5px 0; }
+        .stat-card span { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+
+        .executives { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 30px; }
         .card { background: var(--card-bg); padding: 20px 10px; border-radius: 26px; box-shadow: var(--shadow-soft); text-align: center; border-bottom: 6px solid var(--primary); }
-        .controls { display: flex; align-items: center; justify-content: space-around; background: rgba(0, 102, 102, 0.05); padding: 8px; border-radius: 50px; }
-        .controls button { width: 38px; height: 38px; border: none; border-radius: 50%; background: var(--primary); color: white; cursor: pointer; font-size: 1.4rem; }
-        .chart-wrapper { background: var(--card-bg); padding: 25px; border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; height: 450px; }
         
+        .controls { display: flex; align-items: center; justify-content: space-around; background: rgba(0, 102, 102, 0.05); padding: 8px; border-radius: 50px; }
+        .controls button { width: 40px; height: 40px; border: none; border-radius: 50%; background: var(--primary); color: white; cursor: pointer; font-size: 1.4rem; }
+        
+        .chart-wrapper { background: var(--card-bg); padding: 20px; border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 30px; height: 400px; }
+
         #adminPanel {
-            position: fixed; right: -450px; top: 0; width: 90%; max-width: 400px; 
+            position: fixed; right: -100%; top: 0; width: 100%; max-width: 400px; 
             height: 100vh; background: var(--card-bg); box-shadow: -20px 0 50px rgba(0,0,0,0.15);
-            transition: 0.5s ease; z-index: 1000; padding: 30px; box-sizing: border-box;
+            transition: 0.5s ease; z-index: 1000; padding: 25px; box-sizing: border-box;
         }
         #adminPanel.active { right: 0; }
-        .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+        .locked { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
         .locked-tag { color: #ff4757; font-size: 0.7rem; font-weight: 800; display: block; }
-        .footer-export { text-align: center; padding: 45px 20px; background: var(--card-bg); border-radius: 35px; box-shadow: var(--shadow-soft); margin-bottom: 40px; }
+
+        .footer-export { 
+            text-align: center; padding: 30px 15px; background: var(--card-bg); border-radius: 35px; 
+            box-shadow: var(--shadow-soft); margin-bottom: 40px; 
+        }
+        .footer-export h3 { margin-top: 0; }
+        .footer-export input { margin-bottom: 10px; width: 130px; }
+
+        @media (max-width: 768px) {
+            .rak-left { position: static; font-size: 2rem; margin-bottom: -10px; }
+            .top-controls { position: static; margin-bottom: 15px; }
+            .showroom-title { font-size: 1.8rem; }
+            .totals { grid-template-columns: 1fr; }
+            .stat-card { padding: 15px; }
+            .executives { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .executives { grid-template-columns: 1fr; }
+            .footer-export button { width: 100%; margin: 10px 0 0 0; }
+            .footer-export input { width: 40%; }
+            #time { font-size: 3rem; }
+        }
     </style>
 </head>
 <body>
@@ -190,8 +210,8 @@
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin:0; font-weight: 700;">Traffic Trends</h3>
             <select id="viewSelector" onchange="renderChart()" style="padding:8px; border-radius:10px; border:1px solid #ddd; font-family:inherit;">
-                <option value="line">Monthly Activity (Line)</option>
-                <option value="bar">Day Analysis (Bar)</option>
+                <option value="line">Daily Trend (Line)</option>
+                <option value="bar">Day of Week Analysis (Bar)</option>
             </select>
         </div>
         <canvas id="walkinChart"></canvas>
@@ -217,7 +237,6 @@
 </div>
 
 <script>
-// --- CONFIGURATION ---
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY", 
     authDomain: "walkins-1075c.firebaseapp.com",
@@ -234,7 +253,6 @@ let historyData = [];
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const showroomLat = 25.1286086, showroomLon = 56.3247819, allowedRadiusKM = 2;
 
-// --- DATA SYNC ---
 db.ref("executiveList").on("value", snap => {
     executives = Object.values(snap.val() || {}).sort();
     renderGrid();
@@ -306,77 +324,36 @@ function updateInsights(monthlyCounts, dailyTotal) {
     const insightEl = document.getElementById("smart-insight");
     let messages = [];
 
-    // 1. NASAR SEGMENT
     const nasarJokes = [
         `NASAR'S RULE: If a customer smiles, they've basically bought a bathroom set. 📋`,
         `NASAR: "The dashboard is green, but my tea is cold. More sales please!" ☕`,
         `NASAR'S SECRET: He doesn't sleep, he just waits for the next Order. 🧱`,
-		`NASAR: "If you have time to sit, you have time to sell." 🪑`,
-		`NASAR'S RULE: No phone scrolling unless it's checking a confirmed order. 📱`,
-		`NASAR: "Smile wider… that customer looks expensive." 😏`,
-		`NASAR'S ALERT: Someone just walked in. Why are we still breathing normally? 🚨`,
-		`NASAR: "Every 'just looking' is a future invoice. Act accordingly." 🧾`,
-		`NASAR'S WARNING: Tiles don't sell themselves… unfortunately. 🧱`,
-		`NASAR: "If they ask for discount, increase your confidence." 💼`,
-		`NASAR'S SECRET: He knows who missed that walk-in… always. 👀`,
-		`NASAR'S RULE: First to greet = first to close. 🥇`,
-		`NASAR: "Energy low? Commission should fix that." ⚡`,
-		`NASAR'S CCTV WATCH: That customer needed attention… not decoration. 😅`,
-		`NASAR: "Don't show tiles… show them their dream home." ✨`,
-		`NASAR'S ALERT: Silence in showroom detected. Fix immediately. 🔊`,
-		`NASAR: "Confidence sells more than catalogs." 📖`,
-		`NASAR'S RULE: No second chances on first impressions. 🎯`,
-		`NASAR'S SECRET: He can hear missed opportunities from his chair. 🪑`,
-		`NASAR: "One strong pitch = one strong invoice." 💰`,
-		`NASAR'S WARNING: Someone else is selling what you didn't. ⚠️`,
-		`NASAR: "That 'maybe' should have been a 'confirmed'." 📋`,
-		`NASAR'S RULE: If you're free, you're losing. 📉`,
-		`NASAR: "Every tile has a story… tell it better." 🧠`,
+        `NASAR: "If you have time to sit, you have time to sell." 🪑`,
+        `NASAR'S RULE: No phone scrolling unless it's checking a confirmed order. 📱`,
+        `NASAR: "Smile wider… that customer looks expensive." 😏`,
+        `NASAR'S ALERT: Someone just walked in. Why are we still breathing normally? 🚨`,
+        `NASAR: "Every 'just looking' is a future invoice. Act accordingly." 🧾`,
+        `NASAR: "If they ask for discount, increase your confidence." 💼`,
+        `NASAR: "Don't show tiles… show them their dream home." ✨`,
         `NASAR: "I can smell a big sale from the parking lot. Get ready!" 👃💰`
     ];
     messages.push(`👔 BOSS MOVE: ${nasarJokes[Math.floor(Math.random() * nasarJokes.length)]}`);
 
-    // 2. THE SPOTLIGHT
     let activeExecs = executives.filter(name => !lockedUsers[name]);
     if (activeExecs.length > 0) {
         let sorted = [...activeExecs].sort((a, b) => (monthlyCounts[a] || 0) - (monthlyCounts[b] || 0));
         messages.push(`🎯 SPOTLIGHT: ${sorted[0]}, you're up! Time to close a deal.`);
     }
 
-    // 3. TWO RANDOM EXECUTIVES
     const teamMojo = [
         "is out-charming the showroom lights. 💡",
         "just drank a double espresso. Run, walk-ins! ⚡",
-        "is making the tiles look good just by standing near them. 👠",
-		"is turning browsers into buyers like magic. 🎩",
-		"is casually closing deals in their head already. 🧠",
-		"is making grout sound exciting somehow. 🤯",
-		"is one 'Hello' away from a confirmed sale. 😎",
-		"is scanning the door like a hawk. 👀",
-		"is about to upsell without breaking a sweat. 💼",
-		"is warming up for the next big deal. 🔥",
-		"is making premium look easy. ✨",
-		"is already planning the customer's dream space. 🏡",
-		"is in full showroom domination mode. 🚀",
-		"is reading customers like an open book. 📖",
-		"is silently judging tile choices… professionally. 😏",
-		"is about to say 'We have exactly what you need'. 🎯",
-		"is converting doubts into decisions. 💬",
-		"is running on confidence and good vibes. ⚡",
-		"is making every step count on the showroom floor. 👣",
-		"is one deal away from legend status. 🏆",
-		"is bringing luxury to life, one tile at a time. 💎",
-		"is making competitors nervous without trying. 😌",
-		"is fully booked… mentally. 📅",
-		"is making walk-ins feel like VIPs. 👑",
-		"is turning questions into quotations instantly. 🧾",
-		"is ready for the next challenge. Bring it on! 💪",
-		"is making the showroom look even better today. 🌟",
+        "is turning browsers into buyers like magic. 🎩",
+        "is casually closing deals in their head already. 🧠",
+        "is making every step count on the showroom floor. 👣",
         "is in 'The Zone'. Do not disturb unless buying 1000sqm! 📈",
-        "is officially the Tile Whisperer of Fujairah Showroom. 🧘‍♂️",
-        "is on a winning streak! 🔥",
-		"is operating at 110% efficiency. 📊",
-      
+        "is turning questions into quotations instantly. 🧾",
+        "is officially the Tile Whisperer of Fujairah. 🧘‍♂️"
     ];
 
     if (executives.length > 0) {
@@ -388,7 +365,6 @@ function updateInsights(monthlyCounts, dailyTotal) {
         });
     }
 
-    // 4. STATS & LEADER
     if (dailyTotal > 0) messages.push(`🚀 POWER TEAM: ${dailyTotal} customers served today.`);
     let topExec = Object.keys(monthlyCounts).reduce((a, b) => (monthlyCounts[a] || 0) > (monthlyCounts[b] || 0) ? a : b, "");
     if (topExec) messages.push(`👑 TOP GUN: ${topExec} is ruling the leaderboard!`);
@@ -431,26 +407,34 @@ function renderChart() {
     let labels = [], data = [];
 
     if(type === 'line') {
+        // Line chart shows the trend for EACH DAY of the current month
         labels = Array.from({length: now.getDate()}, (_, i) => i + 1);
         const dailyMap = {};
         historyData.forEach(h => {
             const dt = new Date(h.timestamp);
-            if(dt.getMonth() === now.getMonth()) dailyMap[dt.getDate()] = (dailyMap[dt.getDate()] || 0) + h.count;
+            if(dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear()) {
+                dailyMap[dt.getDate()] = (dailyMap[dt.getDate()] || 0) + h.count;
+            }
         });
         data = labels.map(day => dailyMap[day] || 0);
     } else {
+        // Bar chart aggregates traffic by DAY OF WEEK for the whole month
         labels = dayNames;
-        const weekMap = [0,0,0,0,0,0,0];
-        const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
-        historyData.forEach(h => { if(new Date(h.timestamp) >= startOfWeek) weekMap[new Date(h.timestamp).getDay()] += h.count; });
+        const weekMap = [0,0,0,0,0,0,0]; // Sun=0, Mon=1, etc.
+        historyData.forEach(h => {
+            const dt = new Date(h.timestamp);
+            if(dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear()) {
+                weekMap[dt.getDay()] += h.count;
+            }
+        });
         data = weekMap;
     }
 
     if (walkinChart) walkinChart.destroy();
     walkinChart = new Chart(document.getElementById('walkinChart'), {
         type: type === 'line' ? 'line' : 'bar',
-        data: { labels: labels, datasets: [{ label: 'Visitors', data: data, borderColor: primary, backgroundColor: type === 'line' ? 'rgba(0,168,168,0.1)' : primary, fill: true, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: isDark ? '#1a2b2b' : '#f0f0f0' } } } }
+        data: { labels: labels, datasets: [{ label: 'Visitors', data: data, borderColor: primary, backgroundColor: type === 'line' ? 'rgba(0,168,168,0.1)' : primary, fill: true, tension: 0.4, borderRadius: type === 'bar' ? 8 : 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: isDark ? '#1a2b2b' : '#f0f0f0' } }, x: { grid: { display: false } } } }
     });
 }
 
@@ -497,7 +481,7 @@ function exportData(){
 }
 </script>
 <footer style="text-align:center; padding:20px; color:#888; font-size:13px; background: var(--card-bg); border-radius: 0 0 35px 35px;">  
-  © 2026 Hesper. All rights reserved.
+    © 2026 Hesper. All rights reserved.
 </footer>
 </body>
 </html>
