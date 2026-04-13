@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --primary: #006666; 
@@ -407,7 +408,6 @@ function renderChart() {
     let labels = [], data = [];
 
     if(type === 'line') {
-        // Line chart shows the trend for EACH DAY of the current month
         labels = Array.from({length: now.getDate()}, (_, i) => i + 1);
         const dailyMap = {};
         historyData.forEach(h => {
@@ -418,9 +418,8 @@ function renderChart() {
         });
         data = labels.map(day => dailyMap[day] || 0);
     } else {
-        // Bar chart aggregates traffic by DAY OF WEEK for the whole month
         labels = dayNames;
-        const weekMap = [0,0,0,0,0,0,0]; // Sun=0, Mon=1, etc.
+        const weekMap = [0,0,0,0,0,0,0]; 
         historyData.forEach(h => {
             const dt = new Date(h.timestamp);
             if(dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear()) {
@@ -464,24 +463,63 @@ function renderAdmin() {
         </div>`;
     }).join('');
 }
-function addExecutive() { const input = document.getElementById("newExecName"); const name = input.value.trim(); if(name && !executives.includes(name)) db.ref("executiveList").push(name).then(() => { input.value = ""; renderAdmin(); }); }
-function deleteExecutive(name) { if(confirm(`Delete ${name}?`)) { db.ref("executiveList").once("value", snap => { snap.forEach(c => { if(c.val() === name) c.ref.remove(); }); }); db.ref("locks/"+name).remove(); } }
+
+function addExecutive() { 
+    const input = document.getElementById("newExecName"); 
+    const name = input.value.trim(); 
+    if(name && !executives.includes(name)) db.ref("executiveList").push(name).then(() => { input.value = ""; renderAdmin(); }); 
+}
+
+function deleteExecutive(name) { 
+    if(confirm(`Delete ${name}?`)) { 
+        db.ref("executiveList").once("value", snap => { 
+            snap.forEach(c => { if(c.val() === name) c.ref.remove(); }); 
+        }); 
+        db.ref("locks/"+name).remove(); 
+    } 
+}
+
 function toggleLock(name) { db.ref("locks/"+name).set(!lockedUsers[name]); renderAdmin(); }
 
-function exportData(){
-    const s = document.getElementById("startDate").value, e = document.getElementById("endDate").value;
-    if(!s || !e) return alert("Select dates");
+function exportData() {
+    const s = document.getElementById("startDate").value; 
+    const e = document.getElementById("endDate").value;
+    
+    if(!s || !e) return alert("Please select both Start and End dates");
+
     const rows = [["Executive", "Count", "Date", "Time"]];
-    historyData.forEach(d => {
-        const dt = new Date(d.timestamp), dStr = dt.toISOString().split("T")[0];
-        if(dStr >= s && dStr <= e) rows.push([d.executive, d.count, dStr, dt.toLocaleTimeString()]);
+    
+    // Filter records using local date format to match user input
+    const filteredRecords = historyData.filter(d => {
+        const dt = new Date(d.timestamp);
+        const year = dt.getFullYear();
+        const month = String(dt.getMonth() + 1).padStart(2, '0');
+        const day = String(dt.getDate()).padStart(2, '0');
+        const recordDateStr = `${year}-${month}-${day}`;
+        return recordDateStr >= s && recordDateStr <= e;
     });
-    const ws = XLSX.utils.aoa_to_sheet(rows), wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Walkins"); XLSX.writeFile(wb, `Fujairah_Report_${s}_to_${e}.xlsx`);
+
+    if(filteredRecords.length === 0) return alert("No records found for the selected range.");
+
+    filteredRecords.forEach(d => {
+        const dt = new Date(d.timestamp);
+        rows.push([
+            d.executive, 
+            d.count, 
+            dt.toLocaleDateString('en-GB'), 
+            dt.toLocaleTimeString([], { hour12: false })
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Walkins");
+    XLSX.writeFile(wb, `Fujairah_Report_${s}_to_${e}.xlsx`);
 }
 </script>
-<footer style="text-align:center; padding:20px; color:#888; font-size:13px; background: var(--card-bg); border-radius: 0 0 35px 35px;">  
-    © 2026 Hesper. All rights reserved.
+
+<footer style="text-align:center; padding:20px; color:#888; font-size:13px; background: var(--card-bg); border-radius: 0 0 35px 35px;"> 
+      © 2026 Hesper. All rights reserved.
 </footer>
 </body>
 </html>
