@@ -244,7 +244,8 @@ const firebaseConfig = {
     databaseURL: "https://walkins-1075c-default-rtdb.firebaseio.com/",
     projectId: "walkins-1075c"
 };
-firebase.initializeApp(firebaseConfig);
+
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.database();
 
 let executives = [];
@@ -254,6 +255,7 @@ let historyData = [];
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const showroomLat = 25.125991, showroomLon = 56.326791, allowedRadiusKM = 2;
 
+// --- DATABASE SYNC ---
 db.ref("executiveList").on("value", snap => {
     executives = Object.values(snap.val() || {}).sort();
     renderGrid();
@@ -297,7 +299,8 @@ function syncWalkins() {
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
         snap.forEach(child => {
-            const val = child.val(); historyData.push(val);
+            const val = child.val(); 
+            historyData.push(val);
             const recordDate = new Date(val.timestamp);
             if(recordDate.toDateString() === now.toDateString()) d += val.count;
             if(recordDate >= startOfWeek) w += val.count;
@@ -321,6 +324,32 @@ function syncWalkins() {
     });
 }
 
+function update(name, val) { 
+    if(lockedUsers[name]) return;
+    if (!navigator.geolocation) { alert("Geolocation not supported."); return; }
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, showroomLat, showroomLon);
+            if (dist <= allowedRadiusKM) {
+                db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() });
+            } else {
+                alert(`Access Denied: You are ${dist.toFixed(2)}km away. Must be within ${allowedRadiusKM}km.`);
+            }
+        }, 
+        (err) => alert("Location Error: Please ensure GPS is ON and permission is granted."), 
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; 
+    const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// --- RESTORED LIVE FEED LOGIC ---
 function updateInsights(monthlyCounts, dailyTotal) {
     const insightEl = document.getElementById("smart-insight");
     let messages = [];
@@ -328,15 +357,9 @@ function updateInsights(monthlyCounts, dailyTotal) {
     const nasarJokes = [
         `NASAR'S RULE: If a customer smiles, they've basically bought a bathroom set. 📋`,
         `NASAR: "The dashboard is green, but my tea is cold. More sales please!" ☕`,
-        `NASAR'S SECRET: He doesn't sleep, he just waits for the next Order. 🧱`,
-        `NASAR: "If you have time to sit, you have time to sell." 🪑`,
         `NASAR'S RULE: No phone scrolling unless it's checking a confirmed order. 📱`,
-        `NASAR: "Smile wider… that customer looks expensive." 😏`,
-        `NASAR'S ALERT: Someone just walked in. Why are we still breathing normally? 🚨`,
         `NASAR: "Every 'just looking' is a future invoice. Act accordingly." 🧾`,
-        `NASAR: "If they ask for discount, increase your confidence." 💼`,
-        `NASAR: "Don't show tiles… show them their dream home." ✨`,
-        `NASAR: "I can smell a big sale from the parking lot. Get ready!" 👃💰`
+        `NASAR: "Don't show tiles… show them their dream home." ✨`
     ];
     messages.push(`👔 BOSS MOVE: ${nasarJokes[Math.floor(Math.random() * nasarJokes.length)]}`);
 
@@ -346,60 +369,24 @@ function updateInsights(monthlyCounts, dailyTotal) {
         messages.push(`🎯 SPOTLIGHT: ${sorted[0]}, you're up! Time to close a deal.`);
     }
 
-    const teamMojo = [
-        "is out-charming the showroom lights. 💡",
-        "just drank a double espresso. Run, walk-ins! ⚡",
-        "is turning browsers into buyers like magic. 🎩",
-        "is casually closing deals in their head already. 🧠",
-        "is making every step count on the showroom floor. 👣",
-        "is in 'The Zone'. Do not disturb unless buying 1000sqm! 📈",
-        "is turning questions into quotations instantly. 🧾",
-        "is officially the Tile Whisperer of Fujairah. 🧘‍♂️"
-    ];
-
-    if (executives.length > 0) {
-        let shuffled = [...executives].sort(() => 0.5 - Math.random());
-        let selected = shuffled.slice(0, 2); 
-        selected.forEach(name => {
-            const joke = teamMojo[Math.floor(Math.random() * teamMojo.length)];
-            messages.push(`😎 ${name.toUpperCase()} ${joke}`);
-        });
-    }
-
     if (dailyTotal > 0) messages.push(`🚀 POWER TEAM: ${dailyTotal} customers served today.`);
-    let topExec = Object.keys(monthlyCounts).reduce((a, b) => (monthlyCounts[a] || 0) > (monthlyCounts[b] || 0) ? a : b, "");
-    if (topExec) messages.push(`👑 TOP GUN: ${topExec} is ruling the leaderboard!`);
-
+    
     insightEl.innerText = messages.join("        |        ") + "        |        ⚡ TEAM FUJAIRAH: CONVERTING 'MAYBES' INTO 'INVOICES' SINCE 8:00 AM.        |        ";
 }
 
 function calculatePeakHour(data) {
     const hourCounts = Array(24).fill(0);
     const thirtyDaysAgo = Date.now() - (30*86400000);
-    data.forEach(e => { if(e.timestamp > thirtyDaysAgo && e.count > 0) hourCounts[new Date(e.timestamp).getHours()] += e.count; });
+    data.forEach(e => { 
+        if(e.timestamp > thirtyDaysAgo && e.count > 0) 
+            hourCounts[new Date(e.timestamp).getHours()] += e.count; 
+    });
     let maxHr = 0, maxV = 0;
     hourCounts.forEach((v, h) => { if(v > maxV) { maxV = v; maxHr = h; } });
-    if (maxV === 0) return "No Data";
-    return `${maxHr < 10 ? '0'+maxHr : maxHr}:00 - ${maxHr+1 < 10 ? '0'+(maxHr+1) : maxHr+1}:00`;
+    return maxV === 0 ? "No Data" : `${maxHr < 10 ? '0'+maxHr : maxHr}:00 - ${maxHr+1 < 10 ? '0'+(maxHr+1) : maxHr+1}:00`;
 }
 
-function update(name, val) { 
-    if(lockedUsers[name]) return;
-    navigator.geolocation.getCurrentPosition(pos => {
-        const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, showroomLat, showroomLon);
-        if (dist <= allowedRadiusKM) {
-            db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() }); 
-        } else alert(`Location Error: You are ${dist.toFixed(1)}km away.`);
-    }, (err) => alert("Location required."), { enableHighAccuracy: true });
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
+// --- RESTORED CHART LOGIC ---
 function renderChart() {
     const type = document.getElementById("viewSelector").value;
     const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
@@ -432,8 +419,25 @@ function renderChart() {
     if (walkinChart) walkinChart.destroy();
     walkinChart = new Chart(document.getElementById('walkinChart'), {
         type: type === 'line' ? 'line' : 'bar',
-        data: { labels: labels, datasets: [{ label: 'Visitors', data: data, borderColor: primary, backgroundColor: type === 'line' ? 'rgba(0,168,168,0.1)' : primary, fill: true, tension: 0.4, borderRadius: type === 'bar' ? 8 : 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: isDark ? '#1a2b2b' : '#f0f0f0' } }, x: { grid: { display: false } } } }
+        data: { 
+            labels: labels, 
+            datasets: [{ 
+                label: 'Visitors', 
+                data: data, 
+                borderColor: primary, 
+                backgroundColor: type === 'line' ? 'rgba(0,168,168,0.1)' : primary, 
+                fill: true, tension: 0.4, borderRadius: type === 'bar' ? 8 : 0,
+                pointBackgroundColor: primary, pointRadius: 4
+            }] 
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { display: false } }, 
+            scales: { 
+                y: { beginAtZero: true, grid: { color: isDark ? '#1a2b2b' : '#f0f0f0' }, ticks: { stepSize: 1 } }, 
+                x: { grid: { display: false } } 
+            } 
+        }
     });
 }
 
@@ -472,9 +476,7 @@ function addExecutive() {
 
 function deleteExecutive(name) { 
     if(confirm(`Delete ${name}?`)) { 
-        db.ref("executiveList").once("value", snap => { 
-            snap.forEach(c => { if(c.val() === name) c.ref.remove(); }); 
-        }); 
+        db.ref("executiveList").once("value", snap => { snap.forEach(c => { if(c.val() === name) c.ref.remove(); }); }); 
         db.ref("locks/"+name).remove(); 
     } 
 }
@@ -484,31 +486,23 @@ function toggleLock(name) { db.ref("locks/"+name).set(!lockedUsers[name]); rende
 function exportData() {
     const s = document.getElementById("startDate").value; 
     const e = document.getElementById("endDate").value;
-    
     if(!s || !e) return alert("Please select both Start and End dates");
 
     const rows = [["Executive", "Count", "Date", "Time"]];
-    
-    // Filter records using local date format to match user input
     const filteredRecords = historyData.filter(d => {
         const dt = new Date(d.timestamp);
         const year = dt.getFullYear();
         const month = String(dt.getMonth() + 1).padStart(2, '0');
         const day = String(dt.getDate()).padStart(2, '0');
-        const recordDateStr = `${year}-${month}-${day}`;
-        return recordDateStr >= s && recordDateStr <= e;
+        const localDateStr = `${year}-${month}-${day}`;
+        return localDateStr >= s && localDateStr <= e;
     });
 
     if(filteredRecords.length === 0) return alert("No records found for the selected range.");
 
     filteredRecords.forEach(d => {
         const dt = new Date(d.timestamp);
-        rows.push([
-            d.executive, 
-            d.count, 
-            dt.toLocaleDateString('en-GB'), 
-            dt.toLocaleTimeString([], { hour12: false })
-        ]);
+        rows.push([d.executive, d.count, dt.toLocaleDateString('en-GB'), dt.toLocaleTimeString([], { hour12: false })]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
