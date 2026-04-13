@@ -334,7 +334,7 @@ function update(name, val) {
             if (dist <= allowedRadiusKM) {
                 db.ref("walkins").push({ executive: name, count: val, timestamp: Date.now() });
             } else {
-                alert(`Access Denied: You are ${dist.toFixed(2)}km away. Must be at Fujairah Showroom.`);
+                alert(`Access Denied: You are ${dist.toFixed(2)}km away. You must be at Fujairah Showroom.`);
             }
         }, 
         (err) => alert("Location Error: Please ensure GPS is ON and permission is granted."), 
